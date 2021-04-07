@@ -1,12 +1,20 @@
 use crate::{Action, Board};
 
 /// Iterator for possible actions
-pub struct ActionIter {}
+pub struct ActionIter {
+    valid: Vec<Action>,
+}
 
 /// Implements ActionIter
 impl ActionIter {
     pub fn new(board: &Board) -> Self {
-        ActionIter {}
+        let mut valid = Vec::new();
+        
+        for action in &board.valid {
+            valid.push(*action);
+        }
+
+        ActionIter {valid}
     }
 }
 
@@ -15,6 +23,6 @@ impl Iterator for ActionIter {
     type Item = Action;
 
     fn next(&mut self) -> Option<Self::Item> {
-        None
+        self.valid.pop()
     }
 }
