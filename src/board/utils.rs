@@ -24,9 +24,7 @@ pub(super) fn toggle_bit(pos: &Position, idx: &Action) -> Position {
 
 /// Find neighbours of a given tile
 pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
-    
-    let neighbours =
-    if idx > 63 {
+    let neighbours = if idx > 63 {
         Vec::new()
     } else if idx == 63 {
         vec![62, 55, 54]
@@ -45,7 +43,16 @@ pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
     } else if idx < 7 {
         vec![idx + 1, idx - 1, idx + 7, idx + 8, idx + 9]
     } else {
-        vec![idx + 1, idx - 1, idx + 7, idx + 8, idx + 9, idx - 7, idx - 8, idx - 9]
+        vec![
+            idx + 1,
+            idx - 1,
+            idx + 7,
+            idx + 8,
+            idx + 9,
+            idx - 7,
+            idx - 8,
+            idx - 9,
+        ]
     };
 
     return neighbours;
@@ -54,7 +61,7 @@ pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
 /// Move to tile given by direction. If the movement goes out of bound, it returns !0.
 pub(super) fn find_next_idx(idx: &Action, direction: &Action) -> Action {
     let potential_next = idx + direction;
-    
+
     if idx < &64 && distance_l_inf(idx, &potential_next) == 1 {
         potential_next
     } else {
@@ -70,7 +77,7 @@ pub(super) fn count_ones(&pos: &Position) -> u8 {
         counter += 1;
         pos >>= 1;
     }
-    
+
     return counter;
 }
 
@@ -78,7 +85,6 @@ pub(super) fn count_ones(&pos: &Position) -> u8 {
 pub(super) fn coord_to_idx(&(coo_x, coo_y): &(Action, Action)) -> Action {
     coo_x + 8 * coo_y
 }
-
 
 /// Return a coordinate from an index
 fn idx_to_coord(idx: &Action) -> (Action, Action) {
@@ -90,5 +96,8 @@ pub(super) fn distance_l_inf(idx_a: &Action, idx_b: &Action) -> Action {
     let (coo_ax, coo_ay) = idx_to_coord(idx_a);
     let (coo_bx, coo_by) = idx_to_coord(idx_b);
 
-    std::cmp::max(coo_ax.max(coo_bx) - coo_ax.min(coo_bx), coo_ay.max(coo_by) - coo_ay.min(coo_by))
+    std::cmp::max(
+        coo_ax.max(coo_bx) - coo_ax.min(coo_bx),
+        coo_ay.max(coo_by) - coo_ay.min(coo_by),
+    )
 }

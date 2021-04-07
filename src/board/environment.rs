@@ -42,7 +42,7 @@ impl Environment<Action, AgentId> for Board {
         } else {
             let b = self.count_black();
             let w = self.count_white();
-            
+
             if w == b {
                 None
             } else if w < b {

@@ -9,12 +9,12 @@ pub struct ActionIter {
 impl ActionIter {
     pub fn new(board: &Board) -> Self {
         let mut valid = Vec::new();
-        
+
         for action in &board.valid {
             valid.push(*action);
         }
 
-        ActionIter {valid}
+        ActionIter { valid }
     }
 }
 

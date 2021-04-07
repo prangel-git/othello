@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
 
 /// Identity of Othello players
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum AgentId {
     Black,
     White,
@@ -16,7 +16,6 @@ impl Display for AgentId {
         }
     }
 }
-
 
 impl Not for AgentId {
     type Output = Self;

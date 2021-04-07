@@ -2,7 +2,6 @@ use super::*;
 
 /// Utility functions for Othello board
 impl Board {
-
     pub(super) fn new() -> Self {
         let mut tile_w = 0;
         let mut tile_b = 0;
@@ -41,14 +40,12 @@ impl Board {
             valid,
             borders,
         }
-
     }
 
     /// Place a move in the board by the current player. Returns a vector
     /// with the indxes of tiles that need to be flipped
     pub(super) fn place_tile(&mut self, idx: &Action) -> bool {
         if self.valid.contains(idx) {
-
             if self.turn == AgentId::White {
                 self.tile_w = set_bit(&self.tile_w, idx);
                 self.turn = AgentId::Black;
@@ -59,7 +56,6 @@ impl Board {
 
             let filled = self.tile_b | self.tile_w;
             for neighbour in find_neighbours(idx) {
-
                 if read_bit(&filled, &neighbour) {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
@@ -92,10 +88,7 @@ impl Board {
         let mut is_next_white = read_bit(&self.tile_w, &next_idx);
         let mut is_next_occupied = read_bit(&(self.tile_b | self.tile_w), &next_idx);
 
-        while (next_idx < 64)
-            && is_next_white != is_idx_white
-            && is_next_occupied
-        {
+        while (next_idx < 64) && is_next_white != is_idx_white && is_next_occupied {
             tiles.push(next_idx);
             next_idx = find_next_idx(&next_idx, &direction);
             is_next_white = read_bit(&self.tile_w, &next_idx);
@@ -125,26 +118,31 @@ impl Board {
         self.valid.clear();
         let mut attempts = 0u8;
 
-        while attempts < 2  { 
+        while attempts < 2 {
             let is_white_turn = self.turn == AgentId::White;
             let occupied = self.tile_w | self.tile_b;
-            let tile_relevant = if is_white_turn {self.tile_w} else {self.tile_b};
-            
+            let tile_relevant = if is_white_turn {
+                self.tile_w
+            } else {
+                self.tile_b
+            };
+
             for idx in &self.borders {
                 for neighbour in find_neighbours(idx) {
                     let is_occupied = read_bit(&occupied, &neighbour);
                     if is_occupied {
-                        let is_oposite_color = read_bit(&tile_relevant, &neighbour) != is_white_turn;
+                        let is_oposite_color =
+                            read_bit(&tile_relevant, &neighbour) != is_white_turn;
                         if is_oposite_color {
                             self.valid.insert(neighbour);
                         }
                     }
                 }
             }
-            
+
             if self.valid.is_empty() {
                 attempts += 1;
-                self.turn = !self.turn;                
+                self.turn = !self.turn;
             } else {
                 attempts = 3;
             }
