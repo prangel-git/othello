@@ -18,7 +18,7 @@ type Position = u64;
 type SetIdx = HashSet<Action>;
 
 /// Othello board
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Board {
     tile_w: Position, // Set to 1 iff that square of the board is occupied by White.
     tile_b: Position, // Set to 1 iff that square of the board is occupied by Black.

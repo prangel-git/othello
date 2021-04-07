@@ -9,7 +9,7 @@ impl Display for Board {
 
         let mut mask = 1u64;
 
-        for idx in 0..63 {
+        for idx in 0..64 {
             let is_black = (tile_b & mask) == mask;
             let is_white = (tile_w & mask) == mask;
 
@@ -20,13 +20,13 @@ impl Display for Board {
             };
 
             match (is_black, is_white) {
-                (true, false) => write!(f, " {} |", "B")?,
-                (false, true) => write!(f, " {} |", "W")?,
+                (true, false) => write!(f, " {} |", " B ")?,
+                (false, true) => write!(f, " {} |", " W ")?,
                 (false, false) => {
                     if is_valid {
-                        write!(f, " {} |", idx)?
+                        write!(f, " {:02}  |", idx)?
                     } else {
-                        write!(f, " {} |", " ")?
+                        write!(f, " {} |", "   ")?
                     }
                 }
                 (true, true) => write!(f, " {} |", "?")?,
@@ -34,6 +34,6 @@ impl Display for Board {
 
             mask = mask << 1;
         }
-        write!(f, "\nEnd of Board")
+        write!(f, "\nEnd of Board \n {:?}", self)
     }
 }
