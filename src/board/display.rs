@@ -32,7 +32,7 @@ impl Display for Board {
                 (true, true) => write!(f, " {} |", "?")?,
             };
 
-            mask = mask << 1u64;
+            mask = mask << 1;
         }
         write!(f, "\nEnd of Board")
     }

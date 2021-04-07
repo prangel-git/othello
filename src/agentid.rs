@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
+use std::ops::Not;
 
 /// Identity of Othello players
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -12,6 +13,19 @@ impl Display for AgentId {
         match self {
             AgentId::Black => write!(f, "Black Player"),
             AgentId::White => write!(f, "White Player"),
+        }
+    }
+}
+
+
+impl Not for AgentId {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        if self == AgentId::Black {
+            AgentId::White
+        } else {
+            AgentId::Black
         }
     }
 }

@@ -7,7 +7,7 @@ impl Environment<Action, AgentId> for Board {
     type ActionIter = ActionIter;
 
     fn initial_state() -> Self {
-        todo!()
+        Board::new()
     }
 
     fn update(&mut self, a: &Action) -> bool {
@@ -29,7 +29,7 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn is_terminal(&self) -> bool {
-        self.is_terminal
+        self.valid.is_empty()
     }
 
     fn turn(&self) -> AgentId {
@@ -37,6 +37,19 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn winner(&self) -> Option<AgentId> {
-        todo!()
+        if !self.valid.is_empty() {
+            None
+        } else {
+            let b = self.count_black();
+            let w = self.count_white();
+            
+            if w == b {
+                None
+            } else if w < b {
+                Some(AgentId::Black)
+            } else {
+                Some(AgentId::White)
+            }
+        }
     }
 }

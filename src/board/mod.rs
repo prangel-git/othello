@@ -25,5 +25,4 @@ pub struct Board {
     turn: AgentId,     // Identity of the player allowed to make the next move.
     valid: SetIdx,     // Keeps a record of valid moves.
     borders: SetIdx,   // Keeps a record of the border.
-    is_terminal: bool, // True iff the board is terminal
 }
