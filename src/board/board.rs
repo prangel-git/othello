@@ -134,7 +134,7 @@ impl Board {
                         let is_oposite_color =
                             read_bit(&tile_relevant, &neighbour) != is_white_turn;
                         if is_oposite_color {
-                            self.valid.insert(neighbour);
+                            self.valid.insert(*idx);
                         }
                     }
                 }
