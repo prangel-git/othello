@@ -1,30 +1,29 @@
-mod board;
 mod actioniter;
+mod board;
 mod display;
+mod environment;
 mod utils;
 
-use super::AgentId;
 use self::utils::*;
 
+use self::actioniter::ActionIter;
+use super::Action;
+use super::AgentId;
 
-use std::collections::HashMap;
 use std::collections::HashSet;
 
+/// Represents a 64 bits vector. The value of index k, represents a state of the k-th square of a board
+type Position = u64;
 
-
-type Position = u64;            /// Represents a 64 bits vector. The value of index k, represents a state of the k-th square of a board
-type Index = u8;                /// Index of a position
-type Coordinate = (u8, u8);     /// Represents a coordinate for when we see a position as a matrix of 8 by 8.
-
-type SetIdx = HashSet<Index>;
-type ValidAnchors = HashMap<Index, SetIdx>;
+type SetIdx = HashSet<Action>;
 
 /// Othello board
+#[derive(Clone)]
 pub struct Board {
-    tile_w: Position,       // Set to 1 iff that square of the board is occupied by White.
-    filled: Position,       // Set to 1 iff that square of the board is filled by either White or Black.
-    turn: AgentId,          // Identity of the player allowed to make the next move.
-    valid_w: SetIdx,        // Keeps a record of valid White moves 
-    valid_b: SetIdx,        // Keeps a record of valid Black moves
-    anchors: ValidAnchors,  // Returns possible moves for a valid anchor.
+    tile_w: Position,  // Set to 1 iff that square of the board is occupied by White.
+    tile_b: Position,  // Set to 1 iff that square of the board is occupied by Black.
+    turn: AgentId,     // Identity of the player allowed to make the next move.
+    valid: SetIdx,     // Keeps a record of valid moves.
+    borders: SetIdx,   // Keeps a record of the border.
+    is_terminal: bool, // True iff the board is terminal
 }

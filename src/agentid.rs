@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter, Result};
 
 /// Identity of Othello players
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum AgentId {
     Black,
     White,
