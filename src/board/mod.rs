@@ -2,6 +2,7 @@ mod actioniter;
 mod board;
 mod display;
 mod environment;
+mod hash;
 mod utils;
 
 use std::collections::HashSet;
