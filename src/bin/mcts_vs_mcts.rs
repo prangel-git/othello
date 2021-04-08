@@ -1,11 +1,11 @@
 use othello::*;
 
-/// Two human players playing othello.
+/// Two montecarlo players playing othello
 fn main() {
     let mut board = Board::initial_state();
 
-    let mut dark = HumanPlayer::new(AgentId::Black);
-    let mut light = HumanPlayer::new(AgentId::White);
+    let mut dark = MctsUctAgent::new(AgentId::Black, 2f64, 1);
+    let mut light = MctsUctAgent::new(AgentId::White, 2f64, 1);
 
     let log = play(&mut board, &mut dark, &mut light);
 

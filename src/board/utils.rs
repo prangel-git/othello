@@ -60,7 +60,7 @@ pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
 
 /// Move to tile given by direction. If the movement goes out of bound, it returns !0.
 pub(super) fn find_next_idx(idx: &Action, direction: &Action) -> Action {
-    let potential_next = idx + direction;
+    let potential_next = (idx + direction) % 64;
 
     if idx < &64 && distance_l_inf(idx, &potential_next) == 1 {
         potential_next
@@ -69,12 +69,25 @@ pub(super) fn find_next_idx(idx: &Action, direction: &Action) -> Action {
     }
 }
 
+/// Find direction between two indexes (That is, a number to use in combination with find_next_idx)
+pub(super) fn find_direction(a: &Action, b: &Action) -> Action {
+    let direction = a.max(b) - a.min(b);
+
+    if a < b {
+        64 - direction
+    } else {
+        direction
+    }
+}
+
 /// Counts the number of ones in a position
 pub(super) fn count_ones(&pos: &Position) -> u8 {
     let mut pos = pos;
     let mut counter = 0;
     while pos != 0 {
-        counter += 1;
+        if pos & 1 == 1 {
+            counter += 1;
+        }
         pos >>= 1;
     }
 
