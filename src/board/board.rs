@@ -6,8 +6,8 @@ impl Board {
         let mut tile_w = 0;
         let mut tile_b = 0;
         let turn = AgentId::Black;
-        let mut valid = Vec::new();
-        let mut borders = Vec::new();
+        let mut valid = HashSet::new();
+        let mut borders = HashSet::new();
 
         tile_w = toggle_bit(&tile_w, &coord_to_idx(&(3, 3)));
         tile_w = toggle_bit(&tile_w, &coord_to_idx(&(4, 4)));
@@ -15,23 +15,23 @@ impl Board {
         tile_b = toggle_bit(&tile_b, &coord_to_idx(&(3, 4)));
         tile_b = toggle_bit(&tile_b, &coord_to_idx(&(4, 3)));
 
-        valid.push(coord_to_idx(&(2, 3)));
-        valid.push(coord_to_idx(&(3, 2)));
-        valid.push(coord_to_idx(&(5, 4)));
-        valid.push(coord_to_idx(&(4, 5)));
+        valid.insert(coord_to_idx(&(2, 3)));
+        valid.insert(coord_to_idx(&(3, 2)));
+        valid.insert(coord_to_idx(&(5, 4)));
+        valid.insert(coord_to_idx(&(4, 5)));
 
-        borders.push(coord_to_idx(&(2, 2)));
-        borders.push(coord_to_idx(&(2, 3)));
-        borders.push(coord_to_idx(&(2, 4)));
-        borders.push(coord_to_idx(&(2, 5)));
-        borders.push(coord_to_idx(&(3, 2)));
-        borders.push(coord_to_idx(&(3, 5)));
-        borders.push(coord_to_idx(&(4, 2)));
-        borders.push(coord_to_idx(&(4, 5)));
-        borders.push(coord_to_idx(&(5, 2)));
-        borders.push(coord_to_idx(&(5, 3)));
-        borders.push(coord_to_idx(&(5, 4)));
-        borders.push(coord_to_idx(&(5, 5)));
+        borders.insert(coord_to_idx(&(2, 2)));
+        borders.insert(coord_to_idx(&(2, 3)));
+        borders.insert(coord_to_idx(&(2, 4)));
+        borders.insert(coord_to_idx(&(2, 5)));
+        borders.insert(coord_to_idx(&(3, 2)));
+        borders.insert(coord_to_idx(&(3, 5)));
+        borders.insert(coord_to_idx(&(4, 2)));
+        borders.insert(coord_to_idx(&(4, 5)));
+        borders.insert(coord_to_idx(&(5, 2)));
+        borders.insert(coord_to_idx(&(5, 3)));
+        borders.insert(coord_to_idx(&(5, 4)));
+        borders.insert(coord_to_idx(&(5, 5)));
 
         Board {
             tile_w,
@@ -39,6 +39,7 @@ impl Board {
             turn,
             valid,
             borders,
+            score: 0,
         }
     }
 
@@ -47,9 +48,11 @@ impl Board {
     pub(super) fn place_tile(&mut self, idx: &Action) -> bool {
         if self.valid.contains(idx) {
             if self.turn == AgentId::White {
+                self.score += 1;
                 self.tile_w = set_bit(&self.tile_w, idx);
                 self.turn = AgentId::Black;
             } else {
+                self.score -= 1;
                 self.tile_b = set_bit(&self.tile_b, idx);
                 self.turn = AgentId::White;
             }
@@ -60,13 +63,13 @@ impl Board {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
-                    self.borders.retain(|&x| x != neighbour);
+                    self.borders.remove(&neighbour);
                 } else {
-                    self.borders.push(neighbour);
+                    self.borders.insert(neighbour);
                 }
             }
 
-            self.borders.retain(|&x| x != *idx);
+            self.borders.remove(idx);
 
             self.update_valid();
 
@@ -106,6 +109,13 @@ impl Board {
         } else {
             self.tile_w = toggle_bit(&self.tile_w, idx);
             self.tile_b = toggle_bit(&self.tile_b, idx);
+
+            if read_bit(&self.tile_w, idx) {
+                self.score += 2;
+            } else {
+                self.score -= 2;
+            }
+
             true
         }
     }
@@ -139,7 +149,7 @@ impl Board {
                     }
 
                     if found_one_oposite && is_occupied && !is_oposite_color {
-                        self.valid.push(*idx);
+                        self.valid.insert(*idx);
                     }
                 }
             }
@@ -157,6 +167,11 @@ impl Board {
     pub(super) fn are_different_color(&self, x: &Action, y: &Action) -> bool {
         (read_bit(&self.tile_w, x) == true) && (read_bit(&self.tile_b, y) == true)
             || (read_bit(&self.tile_b, x) == true) && (read_bit(&self.tile_w, y) == true)
+    }
+
+    /// Reads the current score
+    pub fn score(&self) -> i8 {
+        self.score
     }
 
     /// Counts the number of white tiles in a position

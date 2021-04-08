@@ -7,6 +7,9 @@ pub use agentid::AgentId;
 mod board;
 pub use board::Board;
 
+mod rewards;
+pub use rewards::*;
+
 pub use gts::abstractions::*;
 pub use gts::agents::*;
 pub use gts::tree_search::*;
