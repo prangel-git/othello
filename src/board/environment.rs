@@ -4,7 +4,7 @@ use super::*;
 
 /// Implements environment for Othello
 impl Environment<Action, AgentId> for Board {
-    type ActionIter = ActionIter;
+    type ActionIter = std::vec::IntoIter<u8>;
 
     fn initial_state() -> Self {
         Board::new()
@@ -21,7 +21,7 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn valid_actions(&self) -> Self::ActionIter {
-        ActionIter::new(self)
+        self.valid_v.clone().into_iter()
     }
 
     fn is_valid(&self, action: &Action) -> bool {

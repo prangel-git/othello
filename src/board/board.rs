@@ -6,6 +6,7 @@ impl Board {
         let mut tile_w = 0;
         let mut tile_b = 0;
         let turn = AgentId::Black;
+        let mut valid_v = Vec::new();
         let mut valid = HashSet::new();
         let mut borders = HashSet::new();
 
@@ -19,6 +20,11 @@ impl Board {
         valid.insert(coord_to_idx(&(3, 2)));
         valid.insert(coord_to_idx(&(5, 4)));
         valid.insert(coord_to_idx(&(4, 5)));
+
+        valid_v.push(coord_to_idx(&(2, 3)));
+        valid_v.push(coord_to_idx(&(3, 2)));
+        valid_v.push(coord_to_idx(&(5, 4)));
+        valid_v.push(coord_to_idx(&(4, 5)));
 
         borders.insert(coord_to_idx(&(2, 2)));
         borders.insert(coord_to_idx(&(2, 3)));
@@ -37,6 +43,7 @@ impl Board {
             tile_w,
             tile_b,
             turn,
+            valid_v,
             valid,
             borders,
             score: 0,
@@ -122,6 +129,7 @@ impl Board {
 
     /// Update valid moves
     fn update_valid(&mut self) {
+        self.valid_v.clear();
         self.valid.clear();
         let mut attempts = 0u8;
 
@@ -149,6 +157,7 @@ impl Board {
                     }
 
                     if found_one_oposite && is_occupied && !is_oposite_color {
+                        self.valid_v.push(*idx);
                         self.valid.insert(*idx);
                     }
                 }
