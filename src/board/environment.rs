@@ -40,12 +40,9 @@ impl Environment<Action, AgentId> for Board {
         if !self.valid.is_empty() {
             None
         } else {
-            let b = self.count_black();
-            let w = self.count_white();
-
-            if w == b {
+            if self.score == 0 {
                 None
-            } else if w < b {
+            } else if self.score < 0 {
                 Some(AgentId::Black)
             } else {
                 Some(AgentId::White)
