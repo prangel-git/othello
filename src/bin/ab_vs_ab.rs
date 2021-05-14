@@ -1,6 +1,6 @@
 use othello::*;
 
-/// Two montecarlo players playing othello
+/// Two alphabeta prunning players playing othello
 fn main() {
     let mut board = Board::initial_state();
 
