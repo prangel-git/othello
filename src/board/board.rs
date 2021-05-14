@@ -46,20 +46,23 @@ impl Board {
             valid_v,
             valid,
             borders,
+            count_b: 2,
+            count_w: 2,
             score: 0,
         }
     }
 
-    /// Place a move in the board by the current player. Returns a vector
-    /// with the indxes of tiles that need to be flipped
-    pub(super) fn place_tile(&mut self, idx: &Action) -> bool {
+    /// Executes the move provided by idx.
+    pub(super) fn action(&mut self, idx: &Action) -> bool {
         if self.valid.contains(idx) {
             if self.turn == AgentId::White {
                 self.score += 1;
+                self.count_w += 1;
                 self.tile_w = set_bit(&self.tile_w, idx);
                 self.turn = AgentId::Black;
             } else {
                 self.score -= 1;
+                self.count_b += 1;
                 self.tile_b = set_bit(&self.tile_b, idx);
                 self.turn = AgentId::White;
             }
@@ -85,6 +88,10 @@ impl Board {
             false
         }
     }
+    /*
+    fn place_tile(&mut self, idx: Action) -> bool {
+        todo!();
+    }*/
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
     /// If there is no anchor, it returns the empty vector
@@ -119,8 +126,12 @@ impl Board {
 
             if read_bit(&self.tile_w, idx) {
                 self.score += 2;
+                self.count_w += 1;
+                self.count_b -= 1;
             } else {
                 self.score -= 2;
+                self.count_w -= 1;
+                self.count_b += 1;
             }
 
             true
@@ -178,18 +189,18 @@ impl Board {
             || (read_bit(&self.tile_b, x) == true) && (read_bit(&self.tile_w, y) == true)
     }
 
-    /// Reads the current score
+    /// Counts the number of white tiles in a position
+    pub fn count_white(&self) -> i8 {
+        self.count_w
+    }
+
+    /// Counts the number of white tiles in a position
+    pub fn count_black(&self) -> i8 {
+        self.count_b
+    }
+
+    /// Returns current score
     pub fn score(&self) -> i8 {
         self.score
-    }
-
-    /// Counts the number of white tiles in a position
-    pub fn count_white(&self) -> u8 {
-        count_ones(&self.tile_w)
-    }
-
-    /// Counts the number of white tiles in a position
-    pub fn count_black(&self) -> u8 {
-        count_ones(&self.tile_b)
     }
 }

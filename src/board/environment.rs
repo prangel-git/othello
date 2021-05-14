@@ -11,7 +11,7 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn update(&mut self, a: &Action) -> bool {
-        self.place_tile(a)
+        self.action(a)
     }
 
     fn what_if(&self, a: &Action) -> Self {
@@ -40,12 +40,12 @@ impl Environment<Action, AgentId> for Board {
         if !self.valid.is_empty() {
             None
         } else {
-            if self.score == 0 {
-                None
-            } else if self.score < 0 {
+            if self.score < 0 {
                 Some(AgentId::Black)
-            } else {
+            } else if self.score > 0 {
                 Some(AgentId::White)
+            } else {
+                None
             }
         }
     }

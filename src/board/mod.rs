@@ -27,5 +27,7 @@ pub struct Board {
     valid_v: VecIdx,  // Keeps a record of valid moves as vector.
     valid: SetIdx,    // Keeps a record of valid moves as set.
     borders: SetIdx,  // Keeps a record of the border.
-    score: i8,        // Counts the difference between white tiles and black tiles.
+    count_w: i8,      // Counts white tiles
+    count_b: i8,      // Counts black tiles
+    score: i8,        // White tiles minus black tiles.
 }

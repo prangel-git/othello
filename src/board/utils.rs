@@ -78,20 +78,6 @@ pub(super) fn find_direction(a: &Action, b: &Action) -> Action {
     }
 }
 
-/// Counts the number of ones in a position
-pub(super) fn count_ones(&pos: &Position) -> u8 {
-    let mut pos = pos;
-    let mut counter = 0;
-    while pos != 0 {
-        if pos & 1 == 1 {
-            counter += 1;
-        }
-        pos >>= 1;
-    }
-
-    return counter;
-}
-
 /// Return an index from a coordinate
 pub(super) fn coord_to_idx(&(coo_x, coo_y): &(Action, Action)) -> Action {
     coo_x + 8 * coo_y
