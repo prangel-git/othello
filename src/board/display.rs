@@ -13,8 +13,6 @@ impl Display for Board {
             let is_black = (tile_b & mask) == mask;
             let is_white = (tile_w & mask) == mask;
 
-            let is_valid = self.valid.contains(&idx);
-
             if idx % 8 == 0 {
                 write!(f, "\n|")?;
             };
@@ -23,7 +21,7 @@ impl Display for Board {
                 (true, false) => write!(f, " {} |", " B ")?,
                 (false, true) => write!(f, " {} |", " W ")?,
                 (false, false) => {
-                    if is_valid {
+                    if self.valid.contains(&idx) {
                         write!(f, " {:02}  |", idx)?
                     } else {
                         write!(f, " {} |", "   ")?

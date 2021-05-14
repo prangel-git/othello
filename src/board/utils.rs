@@ -24,7 +24,7 @@ pub(super) fn toggle_bit(pos: &Position, idx: &Action) -> Position {
 
 /// Find neighbours of a given tile
 pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
-    let neighbours = if idx > 63 {
+    if idx > 63 {
         Vec::new()
     } else if idx == 63 {
         vec![62, 55, 54]
@@ -53,9 +53,7 @@ pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
             idx - 8,
             idx - 9,
         ]
-    };
-
-    return neighbours;
+    }
 }
 
 /// Move to tile given by direction. If the movement goes out of bound, it returns !0.

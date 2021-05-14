@@ -2,6 +2,7 @@ mod board;
 mod display;
 mod environment;
 mod hash;
+mod partial_eq;
 mod utils;
 
 use std::collections::HashSet;
@@ -18,7 +19,7 @@ type SetIdx = HashSet<Action>;
 type VecIdx = Vec<Action>;
 
 /// Othello board
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug)]
 pub struct Board {
     tile_w: Position, // Set to 1 iff that square of the board is occupied by White.
     tile_b: Position, // Set to 1 iff that square of the board is occupied by Black.
