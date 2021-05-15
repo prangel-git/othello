@@ -9,9 +9,9 @@ pub(super) fn read_bit(pos: &Position, idx: &Action) -> bool {
 }
 
 /// Sets the bit of a Position at the Action idx.
-pub(super) fn set_bit(pos: &Position, idx: &Action) -> Position {
+pub(super) fn set_bit(pos: &mut Position, idx: &Action) {
     let mask = 1 << idx;
-    pos | mask
+    *pos |= mask;
 }
 
 /// Clears the bit of a Position at the Action idx.

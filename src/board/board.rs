@@ -40,7 +40,7 @@ impl Board {
                     }
                     self.borders = clear_bit(&self.borders, &neighbour);
                 } else {
-                    self.borders = set_bit(&self.borders, &neighbour);
+                    set_bit(&mut self.borders, &neighbour);
                 }
             }
 
@@ -56,18 +56,18 @@ impl Board {
 
     /// Initializes border of board
     fn initialize_border(&mut self) {
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 2)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 3)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 4)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 5)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(3, 2)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(3, 5)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(4, 2)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(4, 5)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 2)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 3)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 4)));
-        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 5)));
+        set_bit(&mut self.borders, &coord_to_idx(&(2, 2)));
+        set_bit(&mut self.borders, &coord_to_idx(&(2, 3)));
+        set_bit(&mut self.borders, &coord_to_idx(&(2, 4)));
+        set_bit(&mut self.borders, &coord_to_idx(&(2, 5)));
+        set_bit(&mut self.borders, &coord_to_idx(&(3, 2)));
+        set_bit(&mut self.borders, &coord_to_idx(&(3, 5)));
+        set_bit(&mut self.borders, &coord_to_idx(&(4, 2)));
+        set_bit(&mut self.borders, &coord_to_idx(&(4, 5)));
+        set_bit(&mut self.borders, &coord_to_idx(&(5, 2)));
+        set_bit(&mut self.borders, &coord_to_idx(&(5, 3)));
+        set_bit(&mut self.borders, &coord_to_idx(&(5, 4)));
+        set_bit(&mut self.borders, &coord_to_idx(&(5, 5)));
     }
 
     /// Places a tile in an empty space
@@ -76,14 +76,14 @@ impl Board {
             if self.turn == AgentId::White {
                 self.score += 1;
                 self.count_w += 1;
-                self.tile_w = set_bit(&self.tile_w, idx);
+                set_bit(&mut self.tile_w, idx);
             } else {
                 self.score -= 1;
                 self.count_b += 1;
-                self.tile_b = set_bit(&self.tile_b, idx);
+                set_bit(&mut self.tile_b, idx);
             }
             self.turn = !self.turn;
-            self.occupied = set_bit(&self.occupied, idx);
+            set_bit(&mut self.occupied, idx);
         };
     }
 
@@ -164,7 +164,7 @@ impl Board {
 
                         if found_one_oposite && is_occupied && !is_oposite_color {
                             self.valid_v.push(idx);
-                            self.valid = set_bit(&self.valid, &idx);
+                            set_bit(&mut self.valid, &idx);
                         }
                     }
                 }
