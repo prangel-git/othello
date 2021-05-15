@@ -1,3 +1,5 @@
+mod genetic;
+
 use crate::{AgentId, Board};
 
 /// Gives weights to an othello board. These weights will be used to calculate a reward

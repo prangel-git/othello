@@ -13,3 +13,5 @@ pub use rewards::*;
 pub use gts::abstractions::*;
 pub use gts::agents::*;
 pub use gts::tree_search::*;
+
+pub use genetic::*;
