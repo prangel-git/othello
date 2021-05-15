@@ -3,73 +3,38 @@ use super::*;
 /// Utility functions for Othello board
 impl Board {
     pub(super) fn new() -> Self {
-        let mut tile_w = 0;
-        let mut tile_b = 0;
-        let turn = AgentId::Black;
-        let mut valid_v = Vec::new();
-        let mut valid = HashSet::new();
-        let mut borders = HashSet::new();
-
-        tile_w = toggle_bit(&tile_w, &coord_to_idx(&(3, 3)));
-        tile_w = toggle_bit(&tile_w, &coord_to_idx(&(4, 4)));
-
-        tile_b = toggle_bit(&tile_b, &coord_to_idx(&(3, 4)));
-        tile_b = toggle_bit(&tile_b, &coord_to_idx(&(4, 3)));
-
-        valid.insert(coord_to_idx(&(2, 3)));
-        valid.insert(coord_to_idx(&(3, 2)));
-        valid.insert(coord_to_idx(&(5, 4)));
-        valid.insert(coord_to_idx(&(4, 5)));
-
-        valid_v.push(coord_to_idx(&(2, 3)));
-        valid_v.push(coord_to_idx(&(3, 2)));
-        valid_v.push(coord_to_idx(&(5, 4)));
-        valid_v.push(coord_to_idx(&(4, 5)));
-
-        borders.insert(coord_to_idx(&(2, 2)));
-        borders.insert(coord_to_idx(&(2, 3)));
-        borders.insert(coord_to_idx(&(2, 4)));
-        borders.insert(coord_to_idx(&(2, 5)));
-        borders.insert(coord_to_idx(&(3, 2)));
-        borders.insert(coord_to_idx(&(3, 5)));
-        borders.insert(coord_to_idx(&(4, 2)));
-        borders.insert(coord_to_idx(&(4, 5)));
-        borders.insert(coord_to_idx(&(5, 2)));
-        borders.insert(coord_to_idx(&(5, 3)));
-        borders.insert(coord_to_idx(&(5, 4)));
-        borders.insert(coord_to_idx(&(5, 5)));
-
-        Board {
-            tile_w,
-            tile_b,
-            turn,
-            valid_v,
-            valid,
-            borders,
+        let mut output = Board {
+            tile_w: 0,
+            tile_b: 0,
+            turn: AgentId::Black,
+            valid_v: Vec::new(),
+            valid: HashSet::new(),
+            occupied: HashSet::new(),
+            borders: HashSet::new(),
             count_b: 2,
             count_w: 2,
             score: 0,
-        }
+        };
+
+        output.place_tile(&coord_to_idx(&(3, 3)));
+        output.place_tile(&coord_to_idx(&(3, 4)));
+        output.place_tile(&coord_to_idx(&(4, 4)));
+        output.place_tile(&coord_to_idx(&(4, 3)));
+
+        output.initialize_border();
+
+        output.update_valid();
+
+        return output;
     }
 
     /// Executes the move provided by idx.
     pub(super) fn action(&mut self, idx: &Action) -> bool {
         if self.valid.contains(idx) {
-            if self.turn == AgentId::White {
-                self.score += 1;
-                self.count_w += 1;
-                self.tile_w = set_bit(&self.tile_w, idx);
-                self.turn = AgentId::Black;
-            } else {
-                self.score -= 1;
-                self.count_b += 1;
-                self.tile_b = set_bit(&self.tile_b, idx);
-                self.turn = AgentId::White;
-            }
+            self.place_tile(idx);
 
-            let filled = self.tile_b | self.tile_w;
             for neighbour in find_neighbours(idx) {
-                if read_bit(&filled, &neighbour) {
+                if self.occupied.contains(&neighbour) {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
@@ -88,10 +53,39 @@ impl Board {
             false
         }
     }
-    /*
-    fn place_tile(&mut self, idx: Action) -> bool {
-        todo!();
-    }*/
+
+    /// Initializes border of board
+    fn initialize_border(&mut self) {
+        self.borders.insert(coord_to_idx(&(2, 2)));
+        self.borders.insert(coord_to_idx(&(2, 3)));
+        self.borders.insert(coord_to_idx(&(2, 4)));
+        self.borders.insert(coord_to_idx(&(2, 5)));
+        self.borders.insert(coord_to_idx(&(3, 2)));
+        self.borders.insert(coord_to_idx(&(3, 5)));
+        self.borders.insert(coord_to_idx(&(4, 2)));
+        self.borders.insert(coord_to_idx(&(4, 5)));
+        self.borders.insert(coord_to_idx(&(5, 2)));
+        self.borders.insert(coord_to_idx(&(5, 3)));
+        self.borders.insert(coord_to_idx(&(5, 4)));
+        self.borders.insert(coord_to_idx(&(5, 5)));
+    }
+
+    /// Places a tile in an empty space
+    fn place_tile(&mut self, idx: &Action) {
+        if !self.occupied.contains(idx) {
+            if self.turn == AgentId::White {
+                self.score += 1;
+                self.count_w += 1;
+                self.tile_w = set_bit(&self.tile_w, idx);
+            } else {
+                self.score -= 1;
+                self.count_b += 1;
+                self.tile_b = set_bit(&self.tile_b, idx);
+            }
+            self.turn = !self.turn;
+            self.occupied.insert(*idx);
+        };
+    }
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
     /// If there is no anchor, it returns the empty vector

@@ -26,6 +26,7 @@ pub struct Board {
     turn: AgentId,    // Identity of the player allowed to make the next move.
     valid_v: VecIdx,  // Keeps a record of valid moves as vector.
     valid: SetIdx,    // Keeps a record of valid moves as set.
+    occupied: SetIdx, // Keeps record of occupied spaces.
     borders: SetIdx,  // Keeps a record of the border.
     count_w: i8,      // Counts white tiles
     count_b: i8,      // Counts black tiles
