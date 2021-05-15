@@ -101,9 +101,7 @@ impl Board {
             next_idx = find_next_idx(&next_idx, &direction);
         }
 
-        if next_idx >= 64 {
-            tiles.clear();
-        } else if !read_bit(&(self.tile_b | self.tile_w), &next_idx) {
+        if (next_idx >= 64) | (!self.occupied.contains(&next_idx)) {
             tiles.clear();
         }
 
@@ -111,10 +109,8 @@ impl Board {
     }
 
     /// Flips a tile on the board. It returns true iff the tile was flipped correctly.
-    fn flip(&mut self, idx: &Action) -> bool {
-        if !read_bit(&(self.tile_w | self.tile_b), idx) {
-            false
-        } else {
+    fn flip(&mut self, idx: &Action) {
+        if self.occupied.contains(idx) {
             self.tile_w = toggle_bit(&self.tile_w, idx);
             self.tile_b = toggle_bit(&self.tile_b, idx);
 
@@ -127,8 +123,6 @@ impl Board {
                 self.count_w -= 1;
                 self.count_b += 1;
             }
-
-            true
         }
     }
 
@@ -140,13 +134,12 @@ impl Board {
 
         while attempts < 2 {
             let is_white_turn = self.turn == AgentId::White;
-            let occupied = self.tile_w | self.tile_b;
 
             for idx in &self.borders {
                 for neighbour in find_neighbours(idx) {
                     let direction = find_direction(&&neighbour, idx);
                     let mut new_idx = neighbour;
-                    let mut is_occupied = read_bit(&occupied, &new_idx);
+                    let mut is_occupied = self.occupied.contains(&new_idx);
                     let mut is_oposite_color = read_bit(&self.tile_w, &new_idx) != is_white_turn;
                     let mut found_one_oposite = false;
 
@@ -154,7 +147,7 @@ impl Board {
                         found_one_oposite = true;
                         new_idx = find_next_idx(&new_idx, &direction);
                         if new_idx < 64 {
-                            is_occupied = read_bit(&occupied, &new_idx);
+                            is_occupied = self.occupied.contains(&new_idx);
                             is_oposite_color = read_bit(&self.tile_w, &new_idx) != is_white_turn;
                         } else {
                             break;
