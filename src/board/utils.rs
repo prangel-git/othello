@@ -8,10 +8,16 @@ pub(super) fn read_bit(pos: &Position, idx: &Action) -> bool {
     mask & pos == mask
 }
 
-/// Set the bit of a Position at the Action idx.
+/// Sets the bit of a Position at the Action idx.
 pub(super) fn set_bit(pos: &Position, idx: &Action) -> Position {
     let mask = 1 << idx;
     pos | mask
+}
+
+/// Clears the bit of a Position at the Action idx.
+pub(super) fn clear_bit(pos: &Position, idx: &Action) -> Position {
+    let mask = !(1 << idx);
+    pos & mask
 }
 
 /// Toggle bit of a position at the Action idx.

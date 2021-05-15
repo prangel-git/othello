@@ -10,7 +10,7 @@ impl Board {
             valid_v: Vec::new(),
             valid: 0,
             occupied: 0,
-            borders: HashSet::new(),
+            borders: 0,
             count_b: 2,
             count_w: 2,
             score: 0,
@@ -38,13 +38,13 @@ impl Board {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
-                    self.borders.remove(&neighbour);
+                    self.borders = clear_bit(&self.borders, &neighbour);
                 } else {
-                    self.borders.insert(neighbour);
+                    self.borders = set_bit(&self.borders, &neighbour);
                 }
             }
 
-            self.borders.remove(idx);
+            self.borders = clear_bit(&self.borders, idx);
 
             self.update_valid();
 
@@ -56,18 +56,18 @@ impl Board {
 
     /// Initializes border of board
     fn initialize_border(&mut self) {
-        self.borders.insert(coord_to_idx(&(2, 2)));
-        self.borders.insert(coord_to_idx(&(2, 3)));
-        self.borders.insert(coord_to_idx(&(2, 4)));
-        self.borders.insert(coord_to_idx(&(2, 5)));
-        self.borders.insert(coord_to_idx(&(3, 2)));
-        self.borders.insert(coord_to_idx(&(3, 5)));
-        self.borders.insert(coord_to_idx(&(4, 2)));
-        self.borders.insert(coord_to_idx(&(4, 5)));
-        self.borders.insert(coord_to_idx(&(5, 2)));
-        self.borders.insert(coord_to_idx(&(5, 3)));
-        self.borders.insert(coord_to_idx(&(5, 4)));
-        self.borders.insert(coord_to_idx(&(5, 5)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 2)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 3)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 4)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(2, 5)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(3, 2)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(3, 5)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(4, 2)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(4, 5)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 2)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 3)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 4)));
+        self.borders = set_bit(&self.borders, &coord_to_idx(&(5, 5)));
     }
 
     /// Places a tile in an empty space
@@ -137,30 +137,39 @@ impl Board {
         while attempts < 2 {
             let is_white_turn = self.turn == AgentId::White;
 
-            for idx in &self.borders {
-                for neighbour in find_neighbours(idx) {
-                    let direction = find_direction(&&neighbour, idx);
-                    let mut new_idx = neighbour;
-                    let mut is_occupied = read_bit(&self.occupied, &new_idx);
-                    let mut is_oposite_color = read_bit(&self.tile_w, &new_idx) != is_white_turn;
-                    let mut found_one_oposite = false;
+            let mut idx = 0;
+            let mut borders = self.borders;
 
-                    while is_occupied && is_oposite_color {
-                        found_one_oposite = true;
-                        new_idx = find_next_idx(&new_idx, &direction);
-                        if new_idx < 64 {
-                            is_occupied = read_bit(&self.occupied, &new_idx);
-                            is_oposite_color = read_bit(&self.tile_w, &new_idx) != is_white_turn;
-                        } else {
-                            break;
+            while borders != 0 {
+                if read_bit(&borders, &0) {
+                    for neighbour in find_neighbours(&idx) {
+                        let direction = find_direction(&neighbour, &idx);
+                        let mut new_idx = neighbour;
+                        let mut is_occupied = read_bit(&self.occupied, &new_idx);
+                        let mut is_oposite_color =
+                            read_bit(&self.tile_w, &new_idx) != is_white_turn;
+                        let mut found_one_oposite = false;
+
+                        while is_occupied && is_oposite_color {
+                            found_one_oposite = true;
+                            new_idx = find_next_idx(&new_idx, &direction);
+                            if new_idx < 64 {
+                                is_occupied = read_bit(&self.occupied, &new_idx);
+                                is_oposite_color =
+                                    read_bit(&self.tile_w, &new_idx) != is_white_turn;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if found_one_oposite && is_occupied && !is_oposite_color {
+                            self.valid_v.push(idx);
+                            self.valid = set_bit(&self.valid, &idx);
                         }
                     }
-
-                    if found_one_oposite && is_occupied && !is_oposite_color {
-                        self.valid_v.push(*idx);
-                        self.valid = set_bit(&self.valid, idx);
-                    }
                 }
+                borders >>= 1;
+                idx += 1;
             }
 
             if self.valid == 0 {
