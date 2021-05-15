@@ -7,8 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-gts = {git = "https://github.com/prangel-git/agent-environment.git", branch = "main"}
-# gts = {path = "../gts"}
+    rand = "0.8"
 
-genetic = {git = "https://github.com/prangel-git/genetic", branch = "main"}
-# genetic = {path = "../genetic"}
+    gts = {git = "https://github.com/prangel-git/agent-environment.git", branch = "main"}
+    # gts = {path = "../gts"}
+
+    genetic = {git = "https://github.com/prangel-git/genetic", branch = "main"}
+    # genetic = {path = "../genetic"}

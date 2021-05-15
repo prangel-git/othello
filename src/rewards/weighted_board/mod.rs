@@ -3,6 +3,8 @@ mod genetic;
 use crate::{AgentId, Board};
 
 /// Gives weights to an othello board. These weights will be used to calculate a reward
+
+#[derive(Debug, PartialEq, Eq)]
 pub struct WeightedBoard {
     weights: [u8; 9],
 }
