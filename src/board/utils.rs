@@ -85,7 +85,7 @@ pub(super) fn find_direction(a: &Action, b: &Action) -> Action {
 }
 
 /// Return an index from a coordinate
-pub(super) fn coord_to_idx(&(coo_x, coo_y): &(Action, Action)) -> Action {
+pub(super) fn _coord_to_idx(&(coo_x, coo_y): &(Action, Action)) -> Action {
     coo_x + 8 * coo_y
 }
 

@@ -3,29 +3,18 @@ use super::*;
 /// Utility functions for Othello board
 impl Board {
     pub(super) fn new() -> Self {
-        let mut output = Board {
-            tile_w: 0,
-            tile_b: 0,
+        Board {
+            tile_w: 0b00001000_00010000_00000000_00000000_00000000,
+            tile_b: 0b00010000_00001000_00000000_00000000_00000000,
             turn: AgentId::Black,
-            valid_v: Vec::new(),
-            valid: 0,
-            occupied: 0,
-            borders: 0,
+            valid_v: vec![20, 29, 34, 43],
+            valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
+            occupied: 0b00011000_00011000_00000000_00000000_00000000,
+            borders: 0b00111100_00100100_00100100_00111100_00000000_00000000u64,
             count_b: 2,
             count_w: 2,
             score: 0,
-        };
-
-        output.place_tile(&coord_to_idx(&(3, 3)));
-        output.place_tile(&coord_to_idx(&(3, 4)));
-        output.place_tile(&coord_to_idx(&(4, 4)));
-        output.place_tile(&coord_to_idx(&(4, 3)));
-
-        output.initialize_border();
-
-        output.update_valid();
-
-        return output;
+        }
     }
 
     /// Executes the move provided by idx.
@@ -52,22 +41,6 @@ impl Board {
         } else {
             false
         }
-    }
-
-    /// Initializes border of board
-    fn initialize_border(&mut self) {
-        set_bit(&mut self.borders, &coord_to_idx(&(2, 2)));
-        set_bit(&mut self.borders, &coord_to_idx(&(2, 3)));
-        set_bit(&mut self.borders, &coord_to_idx(&(2, 4)));
-        set_bit(&mut self.borders, &coord_to_idx(&(2, 5)));
-        set_bit(&mut self.borders, &coord_to_idx(&(3, 2)));
-        set_bit(&mut self.borders, &coord_to_idx(&(3, 5)));
-        set_bit(&mut self.borders, &coord_to_idx(&(4, 2)));
-        set_bit(&mut self.borders, &coord_to_idx(&(4, 5)));
-        set_bit(&mut self.borders, &coord_to_idx(&(5, 2)));
-        set_bit(&mut self.borders, &coord_to_idx(&(5, 3)));
-        set_bit(&mut self.borders, &coord_to_idx(&(5, 4)));
-        set_bit(&mut self.borders, &coord_to_idx(&(5, 5)));
     }
 
     /// Places a tile in an empty space
