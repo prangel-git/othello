@@ -38,13 +38,13 @@ impl Board {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
-                    self.borders = clear_bit(&self.borders, &neighbour);
+                    clear_bit(&mut self.borders, &neighbour);
                 } else {
                     set_bit(&mut self.borders, &neighbour);
                 }
             }
 
-            self.borders = clear_bit(&self.borders, idx);
+            clear_bit(&mut self.borders, idx);
 
             self.update_valid();
 
@@ -113,8 +113,8 @@ impl Board {
     /// Flips a tile on the board. It returns true iff the tile was flipped correctly.
     fn flip(&mut self, idx: &Action) {
         if read_bit(&self.occupied, idx) {
-            self.tile_w = toggle_bit(&self.tile_w, idx);
-            self.tile_b = toggle_bit(&self.tile_b, idx);
+            toggle_bit(&mut self.tile_w, idx);
+            toggle_bit(&mut self.tile_b, idx);
 
             if read_bit(&self.tile_w, idx) {
                 self.score += 2;

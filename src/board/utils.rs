@@ -15,15 +15,15 @@ pub(super) fn set_bit(pos: &mut Position, idx: &Action) {
 }
 
 /// Clears the bit of a Position at the Action idx.
-pub(super) fn clear_bit(pos: &Position, idx: &Action) -> Position {
+pub(super) fn clear_bit(pos: &mut Position, idx: &Action) {
     let mask = !(1 << idx);
-    pos & mask
+    *pos &= mask
 }
 
 /// Toggle bit of a position at the Action idx.
-pub(super) fn toggle_bit(pos: &Position, idx: &Action) -> Position {
+pub(super) fn toggle_bit(pos: &mut Position, idx: &Action) {
     let mask = 1 << idx;
-    pos ^ mask
+    *pos ^= mask
 }
 
 // Operations on indexes
