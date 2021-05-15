@@ -21,7 +21,7 @@ impl Display for Board {
                 (true, false) => write!(f, " {} |", " B ")?,
                 (false, true) => write!(f, " {} |", " W ")?,
                 (false, false) => {
-                    if self.valid.contains(&idx) {
+                    if read_bit(&self.valid, &idx) {
                         write!(f, " {:02}  |", idx)?
                     } else {
                         write!(f, " {} |", "   ")?

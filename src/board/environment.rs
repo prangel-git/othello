@@ -25,11 +25,11 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn is_valid(&self, action: &Action) -> bool {
-        self.valid.contains(action)
+        read_bit(&self.valid, action)
     }
 
     fn is_terminal(&self) -> bool {
-        self.valid.is_empty()
+        self.valid == 0
     }
 
     fn turn(&self) -> AgentId {
@@ -37,7 +37,7 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn winner(&self) -> Option<AgentId> {
-        if !self.valid.is_empty() {
+        if self.valid == 0 {
             None
         } else {
             if self.score < 0 {

@@ -8,7 +8,7 @@ impl Board {
             tile_b: 0,
             turn: AgentId::Black,
             valid_v: Vec::new(),
-            valid: HashSet::new(),
+            valid: 0,
             occupied: HashSet::new(),
             borders: HashSet::new(),
             count_b: 2,
@@ -30,7 +30,7 @@ impl Board {
 
     /// Executes the move provided by idx.
     pub(super) fn action(&mut self, idx: &Action) -> bool {
-        if self.valid.contains(idx) {
+        if read_bit(&self.valid, idx) {
             self.place_tile(idx);
 
             for neighbour in find_neighbours(idx) {
@@ -129,7 +129,7 @@ impl Board {
     /// Update valid moves
     fn update_valid(&mut self) {
         self.valid_v.clear();
-        self.valid.clear();
+        self.valid = 0;
         let mut attempts = 0u8;
 
         while attempts < 2 {
@@ -156,12 +156,12 @@ impl Board {
 
                     if found_one_oposite && is_occupied && !is_oposite_color {
                         self.valid_v.push(*idx);
-                        self.valid.insert(*idx);
+                        self.valid = set_bit(&self.valid, idx);
                     }
                 }
             }
 
-            if self.valid.is_empty() {
+            if self.valid == 0 {
                 attempts += 1;
                 self.turn = !self.turn;
             } else {
