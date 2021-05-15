@@ -37,7 +37,7 @@ impl Environment<Action, AgentId> for Board {
     }
 
     fn winner(&self) -> Option<AgentId> {
-        if self.valid == 0 {
+        if self.valid != 0 {
             None
         } else {
             if self.score < 0 {
