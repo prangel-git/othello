@@ -2,15 +2,9 @@ use othello::*;
 
 /// Two alphabeta prunning players playing othello
 fn main() {
-    let mut board = Board::initial_state();
-
-    fn weighted_reward(env: &Board, agent: &AgentId) -> f64 {
-        let weights = WeightedBoard::new();
-        weights.reward(env, agent)        
-    }
-
+    // Making a weighted board for testing
     let mut weights = WeightedBoard::new();
-    weights.set_reward(0,10);
+    weights.set_reward(0, 10);
     weights.set_reward(1, 11);
     weights.set_reward(2, 12);
     weights.set_reward(3, 13);
@@ -24,11 +18,17 @@ fn main() {
         for j in 0..8 {
             print!("|{:02}|", weights.get_weight(i, j));
         }
-        print!{"\n"};
+        print! {"\n"};
     }
 
-    let mut dark = AlphabetaAgent::new(AgentId::Black, &weighted_reward, 1);
-    let mut light = AlphabetaAgent::new(AgentId::White, &weighted_reward, 1);
+    // Testing weighted board during play.
+
+    let mut board = Board::initial_state();
+
+    let reward = |env: &Board, agent: &AgentId| weights.reward(env, agent);
+
+    let mut dark = AlphabetaAgent::new(AgentId::Black, &reward, 1);
+    let mut light = AlphabetaAgent::new(AgentId::White, &reward, 1);
 
     let log = play(&mut board, &mut dark, &mut light);
 
