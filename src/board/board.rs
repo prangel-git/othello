@@ -174,4 +174,14 @@ impl Board {
     pub fn score(&self) -> i8 {
         self.score
     }
+
+    /// Returns white tiles
+    pub fn tiles_w(&self) -> Position {
+        self.tile_w
+    }
+
+    /// Returns black tiles
+    pub fn tiles_b(&self) -> Position {
+        self.tile_b
+    }
 }

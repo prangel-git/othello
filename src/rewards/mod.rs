@@ -1,11 +1,5 @@
-use crate::{AgentId, Board};
+mod greedy;
+pub use greedy::greedy_reward;
 
-pub fn greedy_reward(env: &Board, agent: &AgentId) -> f64 {
-    let score = env.score() as f64;
-
-    if *agent == AgentId::White {
-        score
-    } else {
-        -score
-    }
-}
+mod weighted_board;
+pub use weighted_board::WeightedBoard;
