@@ -25,7 +25,7 @@ fn main() {
 
     let mut board = Board::initial_state();
 
-    let reward = |env: &Board, agent: &AgentId| weights.reward(env, agent);
+    let reward = Box::new(|env: &Board, agent: &AgentId| weights.reward(env, agent));
 
     let mut dark = AlphabetaAgent::new(AgentId::Black, &reward, 1);
     let mut light = AlphabetaAgent::new(AgentId::White, &reward, 1);
