@@ -1,6 +1,5 @@
 use crate::{AgentId, Board};
 
-
 /// Gives weights to an othello board. These weights will be used to calculate a reward
 pub struct WeightedBoard {
     weights: [u8; 9],
@@ -9,10 +8,10 @@ pub struct WeightedBoard {
 impl WeightedBoard {
     /// Creates a new weighted board in which all squares have the same weight
     pub fn new() -> Self {
-        WeightedBoard{ weights: [1; 9] }
+        WeightedBoard { weights: [1; 9] }
     }
 
-    /// Sets the reward for one of the 9 principal squares. 
+    /// Sets the reward for one of the 9 principal squares.
     pub fn set_reward(&mut self, idx: u8, value: u8) {
         let idx = (idx % 9) as usize;
         self.weights[idx] = value;
@@ -23,7 +22,7 @@ impl WeightedBoard {
         if i > 7 || j > 7 {
             0
         } else if i > 3 {
-            self.get_weight(3 - (i % 4) , j)
+            self.get_weight(3 - (i % 4), j)
         } else if j > 3 {
             self.get_weight(i, 3 - (j % 4))
         } else if j > i {
@@ -51,17 +50,17 @@ impl WeightedBoard {
         while (tiles_w | tiles_b) == 0 {
             let (i, j) = (idx % 8, idx / 8);
 
-            if (tiles_w & 1) == 1 { 
+            if (tiles_w & 1) == 1 {
                 total_reward += self.get_weight(i, j) as f64;
             } else if (tiles_b & 1) == 1 {
                 total_reward -= self.get_weight(i, j) as f64;
             }
-            
+
             tiles_w >>= 1;
             tiles_b >>= 1;
 
             idx += 1;
-        };
+        }
 
         if *agent == AgentId::White {
             total_reward
