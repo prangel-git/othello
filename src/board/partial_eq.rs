@@ -3,8 +3,8 @@ use super::Board;
 impl PartialEq for Board {
     fn eq(&self, other: &Self) -> bool {
         (self.turn == other.turn)
-            && (self.tile_current == other.tile_current)
-            && (self.tile_opponent == other.tile_opponent)
+            && (self.tiles_current == other.tiles_current)
+            && (self.tiles_opponent == other.tiles_opponent)
     }
 }
 

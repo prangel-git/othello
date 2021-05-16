@@ -2,11 +2,12 @@ use super::*;
 
 /// Utility functions for Othello board
 impl Board {
+    /// Initializes an othello board with the standard initial position.
     pub(super) fn new() -> Self {
         Board {
             turn: AgentId::Black,
-            tile_current: 0b00010000_00001000_00000000_00000000_00000000,
-            tile_opponent: 0b00001000_00010000_00000000_00000000_00000000,
+            tiles_current: 0b00010000_00001000_00000000_00000000_00000000,
+            tiles_opponent: 0b00001000_00010000_00000000_00000000_00000000,
             valid_v: vec![20, 29, 34, 43],
             valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
             occ_bord: 0b00111100_00111100_00111100_00111100_00000000_00000000,
@@ -20,10 +21,10 @@ impl Board {
     pub(super) fn action(&mut self, idx: &Action) -> bool {
         if read_bit(&self.valid, idx) {
             for neighbour in find_neighbours(idx) {
-                if read_bit(self.opponent_tiles(), &neighbour) {
+                if read_bit(&self.tiles_opponent, &neighbour) {
                     let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, neighbour);
-                    self.tile_current ^= tiles_to_flip;
-                    self.tile_opponent ^= tiles_to_flip;
+                    self.tiles_current ^= tiles_to_flip;
+                    self.tiles_opponent ^= tiles_to_flip;
 
                     self.score += 2 * number_to_flip;
                     self.count_current += number_to_flip;
@@ -41,17 +42,17 @@ impl Board {
         }
     }
 
-    /// Places a tile in an empty space
+    /// Places a tile and switches turns.
     fn place_tile(&mut self, idx: &Action) {
         self.score += 1;
         self.count_current += 1;
-        set_bit(&mut self.tile_current, idx);
+        set_bit(&mut self.tiles_current, idx);
 
         self.switch_turn();
     }
 
-    /// Returns a vector containing the tiles from Action of different color until an anchor.
-    /// If there is no anchor, it returns the empty vector
+    /// Given an index and neighbour, it finds a mask with the tiles to flip.
+    /// If no tiles can be flipped, it returns zero.
     fn find_tiles_to_flip(&self, idx: &Action, neighbour: Action) -> (Position, i8) {
         let direction = find_direction(&neighbour, idx);
 
@@ -60,7 +61,7 @@ impl Board {
 
         let mut next_idx = find_next_idx(idx, &direction);
 
-        while (next_idx < 64) && read_bit(self.opponent_tiles(), &next_idx) {
+        while (next_idx < 64) && read_bit(&self.tiles_opponent, &next_idx) {
             set_bit(&mut tiles_to_flip, &next_idx);
             number_to_flip += 1;
             next_idx = find_next_idx(&next_idx, &direction);
@@ -69,7 +70,7 @@ impl Board {
         if next_idx >= 64 {
             tiles_to_flip = 0;
             number_to_flip = 0;
-        } else if !read_bit(self.current_tiles(), &next_idx) {
+        } else if !read_bit(&self.tiles_current, &next_idx) {
             tiles_to_flip = 0;
             number_to_flip = 0;
         }
@@ -83,7 +84,7 @@ impl Board {
         self.valid = 0;
         let mut attempts = 0u8;
 
-        let occupied = self.tile_current | self.tile_opponent;
+        let occupied = self.tiles_current | self.tiles_opponent;
 
         while attempts < 2 {
             let mut idx = 0;
@@ -92,7 +93,7 @@ impl Board {
             while borders != 0 {
                 if read_bit(&borders, &0) {
                     for neighbour in find_neighbours(&idx) {
-                        if read_bit(self.opponent_tiles(), &neighbour) {
+                        if read_bit(&self.tiles_opponent, &neighbour) {
                             let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
                             if tiles_to_flip != 0 {
                                 self.valid_v.push(idx);
@@ -120,9 +121,9 @@ impl Board {
         self.turn = !self.turn;
         self.score = -self.score;
 
-        let tile_current = self.tile_opponent;
-        self.tile_opponent = self.tile_current;
-        self.tile_current = tile_current;
+        let tile_current = self.tiles_opponent;
+        self.tiles_opponent = self.tiles_current;
+        self.tiles_current = tile_current;
 
         let count_current = self.count_opponent;
         self.count_opponent = self.count_current;
@@ -130,13 +131,13 @@ impl Board {
     }
 
     /// Returns current player tiles
-    fn current_tiles(&self) -> &Position {
-        &self.tile_current
+    pub fn tiles_current(&self) -> &Position {
+        &self.tiles_current
     }
 
     /// Returns oponent player tiles
-    fn opponent_tiles(&self) -> &Position {
-        &self.tile_opponent
+    pub fn tiles_opponent(&self) -> &Position {
+        &self.tiles_opponent
     }
 
     /// Counts the number of white tiles in a position
@@ -165,18 +166,18 @@ impl Board {
     /// Returns white tiles
     pub fn tiles_w(&self) -> Position {
         if self.turn == AgentId::White {
-            self.tile_current
+            self.tiles_current
         } else {
-            self.tile_opponent
+            self.tiles_opponent
         }
     }
 
     /// Returns black tiles
     pub fn tiles_b(&self) -> Position {
         if self.turn == AgentId::Black {
-            self.tile_current
+            self.tiles_current
         } else {
-            self.tile_opponent
+            self.tiles_opponent
         }
     }
 }

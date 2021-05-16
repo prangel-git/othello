@@ -43,33 +43,29 @@ impl WeightedBoard {
     }
 
     /// Calculates the reward for a particular board based on the given weights.
-    pub fn reward(&self, env: &Board, agent: &AgentId) -> f64 {
+    pub fn reward(&self, env: &Board, _agent: &AgentId) -> f64 {
         let mut total_reward = 0i64;
 
-        let mut tiles_w = env.tiles_w();
-        let mut tiles_b = env.tiles_b();
+        let mut tiles_current = *env.tiles_current();
+        let mut tiles_opponent = *env.tiles_opponent();
 
         let mut idx = 0u8;
 
-        while (tiles_w | tiles_b) == 0 {
+        while (tiles_current | tiles_opponent) == 0 {
             let (i, j) = (idx % 8, idx / 8);
 
-            if (tiles_w & 1) == 1 {
+            if (tiles_current & 1) == 1 {
                 total_reward += self.get_weight(i, j) as i64;
-            } else if (tiles_b & 1) == 1 {
+            } else if (tiles_opponent & 1) == 1 {
                 total_reward -= self.get_weight(i, j) as i64;
             }
 
-            tiles_w >>= 1;
-            tiles_b >>= 1;
+            tiles_current >>= 1;
+            tiles_opponent >>= 1;
 
             idx += 1;
         }
 
-        if *agent == AgentId::White {
-            total_reward as f64
-        } else {
-            -total_reward as f64
-        }
+        return total_reward as f64;
     }
 }
