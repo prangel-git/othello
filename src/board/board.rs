@@ -7,9 +7,10 @@ impl Board {
             tile_w: 0b00001000_00010000_00000000_00000000_00000000,
             tile_b: 0b00010000_00001000_00000000_00000000_00000000,
             turn: AgentId::Black,
+            tile_o: 0b00001000_00010000_00000000_00000000_00000000,
+            tile_c: 0b00010000_00001000_00000000_00000000_00000000,
             valid_v: vec![20, 29, 34, 43],
             valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
-            occupied: 0b00000000_00011000_00011000_00000000_00000000_00000000,
             occ_bord: 0b00111100_00111100_00111100_00111100_00000000_00000000,
             count_b: 2,
             count_w: 2,
@@ -20,16 +21,16 @@ impl Board {
     /// Executes the move provided by idx.
     pub(super) fn action(&mut self, idx: &Action) -> bool {
         if read_bit(&self.valid, idx) {
-            self.place_tile(idx);
-
             for neighbour in find_neighbours(idx) {
-                if read_bit(&self.occupied, &neighbour) {
+                if read_bit(self.opponent_tiles(), &neighbour) {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
                 }
             }
 
+            self.place_tile(idx);
+            self.occ_bord |= neighbours_mask(&idx);
             self.update_valid();
 
             true
@@ -40,21 +41,20 @@ impl Board {
 
     /// Places a tile in an empty space
     fn place_tile(&mut self, idx: &Action) {
-        if !read_bit(&self.occupied, idx) {
-            if self.turn == AgentId::White {
-                self.score += 1;
-                self.count_w += 1;
-                set_bit(&mut self.tile_w, idx);
-            } else {
-                self.score -= 1;
-                self.count_b += 1;
-                set_bit(&mut self.tile_b, idx);
-            }
-            self.turn = !self.turn;
-            set_bit(&mut self.occupied, idx);
-        };
-
-        self.occ_bord |= neighbours_mask(&idx);
+        if self.turn == AgentId::White {
+            self.score += 1;
+            self.count_w += 1;
+            set_bit(&mut self.tile_w, idx);
+            self.tile_o = self.tile_w;
+            self.tile_c = self.tile_b
+        } else {
+            self.score -= 1;
+            self.count_b += 1;
+            set_bit(&mut self.tile_b, idx);
+            self.tile_o = self.tile_b;
+            self.tile_c = self.tile_w;
+        }
+        self.turn = !self.turn;
     }
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
@@ -66,35 +66,33 @@ impl Board {
 
         let mut next_idx = find_next_idx(idx, &direction);
 
-        while (next_idx < 64) && self.are_different_color(idx, &next_idx) {
+        while (next_idx < 64) && read_bit(self.opponent_tiles(), &next_idx) {
             tiles.push(next_idx);
             next_idx = find_next_idx(&next_idx, &direction);
         }
 
         if next_idx >= 64 {
             tiles.clear();
-        } else if !read_bit(&self.occupied, &next_idx) {
+        } else if !read_bit(self.current_tiles(), &next_idx) {
             tiles.clear();
         }
 
         return tiles;
     }
 
-    /// Flips a tile on the board. It returns true iff the tile was flipped correctly.
+    /// Flips a tile on the board.
     fn flip(&mut self, idx: &Action) {
-        if read_bit(&self.occupied, idx) {
-            toggle_bit(&mut self.tile_w, idx);
-            toggle_bit(&mut self.tile_b, idx);
+        toggle_bit(&mut self.tile_w, idx);
+        toggle_bit(&mut self.tile_b, idx);
 
-            if read_bit(&self.tile_w, idx) {
-                self.score += 2;
-                self.count_w += 1;
-                self.count_b -= 1;
-            } else {
-                self.score -= 2;
-                self.count_w -= 1;
-                self.count_b += 1;
-            }
+        if read_bit(&self.tile_w, idx) {
+            self.score += 2;
+            self.count_w += 1;
+            self.count_b -= 1;
+        } else {
+            self.score -= 2;
+            self.count_w -= 1;
+            self.count_b += 1;
         }
     }
 
@@ -104,18 +102,20 @@ impl Board {
         self.valid = 0;
         let mut attempts = 0u8;
 
+        let occupied = self.tile_w | self.tile_b;
+
         while attempts < 2 {
             let is_white_turn = self.turn == AgentId::White;
 
             let mut idx = 0;
-            let mut borders = self.occ_bord & !self.occupied;
+            let mut borders = self.occ_bord & !occupied;
 
             while borders != 0 {
                 if read_bit(&borders, &0) {
                     for neighbour in find_neighbours(&idx) {
                         let direction = find_direction(&neighbour, &idx);
                         let mut new_idx = neighbour;
-                        let mut is_occupied = read_bit(&self.occupied, &new_idx);
+                        let mut is_occupied = read_bit(&occupied, &new_idx);
                         let mut is_oposite_color =
                             read_bit(&self.tile_w, &new_idx) != is_white_turn;
                         let mut found_one_oposite = false;
@@ -124,7 +124,7 @@ impl Board {
                             found_one_oposite = true;
                             new_idx = find_next_idx(&new_idx, &direction);
                             if new_idx < 64 {
-                                is_occupied = read_bit(&self.occupied, &new_idx);
+                                is_occupied = read_bit(&occupied, &new_idx);
                                 is_oposite_color =
                                     read_bit(&self.tile_w, &new_idx) != is_white_turn;
                             } else {
@@ -151,10 +151,14 @@ impl Board {
         }
     }
 
-    /// Checks if two indexes are occupied by different players
-    pub(super) fn are_different_color(&self, x: &Action, y: &Action) -> bool {
-        (read_bit(&self.tile_w, x) == true) && (read_bit(&self.tile_b, y) == true)
-            || (read_bit(&self.tile_b, x) == true) && (read_bit(&self.tile_w, y) == true)
+    /// Returns current player tiles
+    fn current_tiles(&self) -> &Position {
+        &self.tile_c
+    }
+
+    /// Returns oponent player tiles
+    fn opponent_tiles(&self) -> &Position {
+        &self.tile_o
     }
 
     /// Counts the number of white tiles in a position

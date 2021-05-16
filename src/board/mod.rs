@@ -21,11 +21,12 @@ pub struct Board {
     tile_w: Position,   // Set to 1 iff that square of the board is occupied by White.
     tile_b: Position,   // Set to 1 iff that square of the board is occupied by Black.
     turn: AgentId,      // Identity of the player allowed to make the next move.
-    valid_v: VecIdx,    // Keeps a record of valid moves as vector.
-    valid: Position,    // Keeps a record of valid moves as set.
-    occupied: Position, // Keeps record of occupied spaces.
+    tile_c: Position,   // Set to 1 iff that square of the board is occupied by current turn player.
+    tile_o: Position, // Set to 1 iff that square of the board is occupied by opposite turn player.
+    valid_v: VecIdx,  // Keeps a record of valid moves as vector.
+    valid: Position,  // Keeps a record of valid moves as set.
     occ_bord: Position, // Keeps record of occupied spaces with border.
-    count_w: i8,        // Counts white tiles
-    count_b: i8,        // Counts black tiles
-    score: i8,          // White tiles minus black tiles.
+    count_w: i8,      // Counts white tiles
+    count_b: i8,      // Counts black tiles
+    score: i8,        // White tiles minus black tiles.
 }
