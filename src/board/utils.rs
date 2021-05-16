@@ -43,40 +43,6 @@ pub(super) fn neighbours_mask(&idx: &Action) -> Position {
     }
 }
 
-/// Find neighbours of a given tile
-pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
-    if idx > 63 {
-        Vec::new()
-    } else if idx == 63 {
-        vec![62, 55, 54]
-    } else if idx > 56 {
-        vec![idx + 1, idx - 1, idx - 7, idx - 8, idx - 9]
-    } else if idx == 56 {
-        vec![57, 48, 49]
-    } else if idx == 0 {
-        vec![1, 8, 9]
-    } else if (idx % 8) == 0 {
-        vec![idx + 1, idx + 8, idx + 9, idx - 8, idx - 7]
-    } else if idx == 7 {
-        vec![6, 15, 14]
-    } else if (idx % 8) == 7 {
-        vec![idx - 1, idx - 8, idx - 9, idx + 8, idx + 7]
-    } else if idx < 7 {
-        vec![idx + 1, idx - 1, idx + 7, idx + 8, idx + 9]
-    } else {
-        vec![
-            idx + 1,
-            idx - 1,
-            idx + 7,
-            idx + 8,
-            idx + 9,
-            idx - 7,
-            idx - 8,
-            idx - 9,
-        ]
-    }
-}
-
 /// Move to tile given by direction. If the movement goes out of bound, it returns !0.
 pub(super) fn find_next_idx(idx: &Action, direction: &Action) -> Action {
     let potential_next = (idx + direction) % 64;
@@ -85,17 +51,6 @@ pub(super) fn find_next_idx(idx: &Action, direction: &Action) -> Action {
         potential_next
     } else {
         !0
-    }
-}
-
-/// Find direction between two indexes (That is, a number to use in combination with find_next_idx)
-pub(super) fn find_direction(a: &Action, b: &Action) -> Action {
-    let direction = a.max(b) - a.min(b);
-
-    if a < b {
-        64 - direction
-    } else {
-        direction
     }
 }
 

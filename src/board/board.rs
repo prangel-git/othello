@@ -19,20 +19,28 @@ impl Board {
     /// Executes the move provided by idx.
     pub(super) fn action(&mut self, idx: &Action) -> bool {
         if read_bit(&self.valid, idx) {
-            for neighbour in find_neighbours(idx) {
-                if read_bit(&self.tiles_opponent, &neighbour) {
-                    let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, neighbour);
-                    self.tiles_current ^= tiles_to_flip;
-                    self.tiles_opponent ^= tiles_to_flip;
+            let mask = neighbours_mask(&idx);
+            let mut directions = self.tiles_opponent & mask;
 
-                    self.score += 2 * number_to_flip;
-                    self.count_current += number_to_flip;
-                    self.count_opponent -= number_to_flip;
-                }
+            if *idx > 9 {
+                directions >>= *idx - 9
+            } else {
+                directions <<= 9 - *idx
+            }
+
+            for direction in PositionIter::new(&directions) {
+                let dir = direction + 64 - 9;
+                let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, dir);
+                self.tiles_current ^= tiles_to_flip;
+                self.tiles_opponent ^= tiles_to_flip;
+
+                self.score += 2 * number_to_flip;
+                self.count_current += number_to_flip;
+                self.count_opponent -= number_to_flip;
             }
 
             self.place_tile(idx);
-            self.occ_bord |= neighbours_mask(&idx);
+            self.occ_bord |= mask;
             self.update_valid();
 
             true
@@ -52,9 +60,7 @@ impl Board {
 
     /// Given an index and neighbour, it finds a mask with the tiles to flip.
     /// If no tiles can be flipped, it returns zero.
-    fn find_tiles_to_flip(&self, idx: &Action, neighbour: Action) -> (Position, i8) {
-        let direction = find_direction(&neighbour, idx);
-
+    fn find_tiles_to_flip(&self, idx: &Action, direction: Action) -> (Position, i8) {
         let mut tiles_to_flip = 0u64;
         let mut number_to_flip = 0i8;
 
@@ -87,13 +93,21 @@ impl Board {
 
         while attempts < 2 {
             for idx in PositionIter::new(&borders) {
-                for neighbour in find_neighbours(&idx) {
-                    if read_bit(&self.tiles_opponent, &neighbour) {
-                        let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
-                        if tiles_to_flip != 0 {
-                            set_bit(&mut self.valid, &idx);
-                            break;
-                        }
+                let mask = neighbours_mask(&idx);
+                let mut directions = self.tiles_opponent & mask;
+
+                if idx > 9 {
+                    directions >>= idx - 9
+                } else {
+                    directions <<= 9 - idx
+                }
+
+                for direction in PositionIter::new(&directions) {
+                    let dir = direction + 64 - 9;
+                    let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, dir);
+                    if tiles_to_flip != 0 {
+                        set_bit(&mut self.valid, &idx);
+                        break;
                     }
                 }
             }
