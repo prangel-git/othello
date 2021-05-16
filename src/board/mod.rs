@@ -24,7 +24,7 @@ pub struct Board {
     valid_v: VecIdx,    // Keeps a record of valid moves as vector.
     valid: Position,    // Keeps a record of valid moves as set.
     occupied: Position, // Keeps record of occupied spaces.
-    borders: Position,  // Keeps a record of the border.
+    occ_bord: Position, // Keeps record of occupied spaces with border.
     count_w: i8,        // Counts white tiles
     count_b: i8,        // Counts black tiles
     score: i8,          // White tiles minus black tiles.

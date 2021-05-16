@@ -15,7 +15,7 @@ pub(super) fn set_bit(pos: &mut Position, idx: &Action) {
 }
 
 /// Clears the bit of a Position at the Action idx.
-pub(super) fn clear_bit(pos: &mut Position, idx: &Action) {
+pub(super) fn _clear_bit(pos: &mut Position, idx: &Action) {
     let mask = !(1 << idx);
     *pos &= mask
 }
@@ -27,6 +27,33 @@ pub(super) fn toggle_bit(pos: &mut Position, idx: &Action) {
 }
 
 // Operations on indexes
+
+/// Find neighbours of a given tile
+pub(super) fn neighbours_mask(&idx: &Action) -> u64 {
+    if idx > 63 {
+        0u64
+    } else if idx == 63 {
+        0b00000000_00000011_00000011u64 << (idx - 9)
+    } else if idx > 56 {
+        0b00000000_00000111_00000111u64 << (idx - 9)
+    } else if idx == 56 {
+        0b00000000_00000110_00000110u64 << (idx - 9)
+    } else if idx == 0 {
+        0b00000110_00000110_00000000u64 >> 9
+    } else if idx == 8 {
+        0b00000110_00000110_00000110u64 >> 1
+    } else if (idx % 8) == 0 {
+        0b00000110_00000110_00000110u64 << (idx - 9)
+    } else if idx == 7 {
+        0b00000011_00000011_00000000u64 >> 2
+    } else if (idx % 8) == 7 {
+        0b00000011_00000011_00000011u64 << (idx - 9)
+    } else if idx < 7 {
+        0b00000111_00000111_00000000u64 >> (9 - idx)
+    } else {
+        0b00000111_00000111_00000111u64 << (idx - 9)
+    }
+}
 
 /// Find neighbours of a given tile
 pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {

@@ -9,8 +9,8 @@ impl Board {
             turn: AgentId::Black,
             valid_v: vec![20, 29, 34, 43],
             valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
-            occupied: 0b00011000_00011000_00000000_00000000_00000000,
-            borders: 0b00111100_00100100_00100100_00111100_00000000_00000000u64,
+            occupied: 0b00000000_00011000_00011000_00000000_00000000_00000000,
+            occ_bord: 0b00111100_00111100_00111100_00111100_00000000_00000000,
             count_b: 2,
             count_w: 2,
             score: 0,
@@ -27,13 +27,8 @@ impl Board {
                     for tiles in self.find_tiles_to_flip(idx, neighbour) {
                         self.flip(&tiles);
                     }
-                    clear_bit(&mut self.borders, &neighbour);
-                } else {
-                    set_bit(&mut self.borders, &neighbour);
                 }
             }
-
-            clear_bit(&mut self.borders, idx);
 
             self.update_valid();
 
@@ -58,6 +53,8 @@ impl Board {
             self.turn = !self.turn;
             set_bit(&mut self.occupied, idx);
         };
+
+        self.occ_bord |= neighbours_mask(&idx);
     }
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
@@ -111,7 +108,7 @@ impl Board {
             let is_white_turn = self.turn == AgentId::White;
 
             let mut idx = 0;
-            let mut borders = self.borders;
+            let mut borders = self.occ_bord & !self.occupied;
 
             while borders != 0 {
                 if read_bit(&borders, &0) {
