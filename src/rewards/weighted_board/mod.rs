@@ -44,6 +44,7 @@ impl WeightedBoard {
 
     /// Calculates the reward for a particular board based on the given weights.
     pub fn reward(&self, env: &Board, _agent: &AgentId) -> f64 {
+        
         let mut total_reward = 0i64;
 
         let mut tiles_current = *env.tiles_current();
