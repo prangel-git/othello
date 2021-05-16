@@ -8,7 +8,6 @@ impl Board {
             turn: AgentId::Black,
             tiles_current: 0b00010000_00001000_00000000_00000000_00000000,
             tiles_opponent: 0b00001000_00010000_00000000_00000000_00000000,
-            valid_v: vec![20, 29, 34, 43],
             valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
             occ_bord: 0b00111100_00111100_00111100_00111100_00000000_00000000,
             count_current: 2,
@@ -80,7 +79,6 @@ impl Board {
 
     /// Update valid moves
     fn update_valid(&mut self) {
-        self.valid_v.clear();
         self.valid = 0;
         let mut attempts = 0u8;
 
@@ -93,7 +91,6 @@ impl Board {
                     if read_bit(&self.tiles_opponent, &neighbour) {
                         let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
                         if tiles_to_flip != 0 {
-                            self.valid_v.push(idx);
                             set_bit(&mut self.valid, &idx);
                             break;
                         }

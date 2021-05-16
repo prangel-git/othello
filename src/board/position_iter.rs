@@ -1,7 +1,7 @@
 use super::Position;
 
 // Implements an iterator from a position
-pub(super) struct PositionIter {
+pub struct PositionIter {
     position: Position,
     index: u8,
 }
