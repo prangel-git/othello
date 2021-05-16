@@ -23,8 +23,18 @@ impl Board {
         if read_bit(&self.valid, idx) {
             for neighbour in find_neighbours(idx) {
                 if read_bit(self.opponent_tiles(), &neighbour) {
-                    for tiles in self.find_tiles_to_flip(idx, neighbour) {
-                        self.flip(&tiles);
+                    let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, neighbour);
+                    self.tile_b ^= tiles_to_flip;
+                    self.tile_w ^= tiles_to_flip;
+
+                    if self.turn == AgentId::White {
+                        self.score += 2 * number_to_flip;
+                        self.count_w += number_to_flip;
+                        self.count_b -= number_to_flip;
+                    } else {
+                        self.score -= 2 * number_to_flip;
+                        self.count_w -= number_to_flip;
+                        self.count_b += number_to_flip;
                     }
                 }
             }
@@ -59,41 +69,29 @@ impl Board {
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
     /// If there is no anchor, it returns the empty vector
-    fn find_tiles_to_flip(&self, idx: &Action, neighbour: Action) -> Vec<Action> {
+    fn find_tiles_to_flip(&self, idx: &Action, neighbour: Action) -> (Position, i8) {
         let direction = find_direction(&neighbour, idx);
 
-        let mut tiles = Vec::new();
+        let mut tiles_to_flip = 0u64;
+        let mut number_to_flip = 0i8;
 
         let mut next_idx = find_next_idx(idx, &direction);
 
         while (next_idx < 64) && read_bit(self.opponent_tiles(), &next_idx) {
-            tiles.push(next_idx);
+            set_bit(&mut tiles_to_flip, &next_idx);
+            number_to_flip += 1;
             next_idx = find_next_idx(&next_idx, &direction);
         }
 
         if next_idx >= 64 {
-            tiles.clear();
+            tiles_to_flip = 0;
+            number_to_flip = 0;
         } else if !read_bit(self.current_tiles(), &next_idx) {
-            tiles.clear();
+            tiles_to_flip = 0;
+            number_to_flip = 0;
         }
 
-        return tiles;
-    }
-
-    /// Flips a tile on the board.
-    fn flip(&mut self, idx: &Action) {
-        toggle_bit(&mut self.tile_w, idx);
-        toggle_bit(&mut self.tile_b, idx);
-
-        if read_bit(&self.tile_w, idx) {
-            self.score += 2;
-            self.count_w += 1;
-            self.count_b -= 1;
-        } else {
-            self.score -= 2;
-            self.count_w -= 1;
-            self.count_b += 1;
-        }
+        return (tiles_to_flip, number_to_flip);
     }
 
     /// Update valid moves

@@ -14,22 +14,10 @@ pub(super) fn set_bit(pos: &mut Position, idx: &Action) {
     *pos |= mask;
 }
 
-/// Clears the bit of a Position at the Action idx.
-pub(super) fn _clear_bit(pos: &mut Position, idx: &Action) {
-    let mask = !(1 << idx);
-    *pos &= mask
-}
-
-/// Toggle bit of a position at the Action idx.
-pub(super) fn toggle_bit(pos: &mut Position, idx: &Action) {
-    let mask = 1 << idx;
-    *pos ^= mask
-}
-
 // Operations on indexes
 
 /// Find neighbours of a given tile
-pub(super) fn neighbours_mask(&idx: &Action) -> u64 {
+pub(super) fn neighbours_mask(&idx: &Action) -> Position {
     if idx > 63 {
         0u64
     } else if idx == 63 {
@@ -54,6 +42,34 @@ pub(super) fn neighbours_mask(&idx: &Action) -> u64 {
         0b00000111_00000111_00000111u64 << (idx - 9)
     }
 }
+/*
+/// Given an index and a board position, it finds all the directions in which the index
+/// can move to get into the board position.
+pub(super) fn find_neighbours_directions(&idx: &Action) -> Vec<Action> {
+
+    if idx > 63 {
+        Vec::new()
+    } else if idx == 63 {
+        vec![63, 56, 55]
+    } else if idx > 56 {
+        vec![1, 63, 57, 56, 55]
+    } else if idx == 56 {
+        vec![1, 56, 57]
+    } else if idx == 0 {
+        vec![1, 8, 9]
+    } else if (idx % 8) == 0 {
+        vec![1, 8, 9, 56, 57]
+    } else if idx == 7 {
+        vec![63, 8, 7]
+    } else if (idx % 8) == 7 {
+        vec![63, 56, 55, 8, 7]
+    } else if idx < 7 {
+        vec![1, 63, 7, 8, 9]
+    } else {
+        vec![1, 63, 7, 8, 9, 57, 56, 55]
+    }
+}
+*/
 
 /// Find neighbours of a given tile
 pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
@@ -109,11 +125,6 @@ pub(super) fn find_direction(a: &Action, b: &Action) -> Action {
     } else {
         direction
     }
-}
-
-/// Return an index from a coordinate
-pub(super) fn _coord_to_idx(&(coo_x, coo_y): &(Action, Action)) -> Action {
-    coo_x + 8 * coo_y
 }
 
 /// Return a coordinate from an index
