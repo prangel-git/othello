@@ -1,5 +1,7 @@
 mod genetic;
 
+use gts::abstractions::Environment;
+
 use crate::{AgentId, Board};
 
 /// Gives weights to an othello board. These weights will be used to calculate a reward
@@ -43,7 +45,7 @@ impl WeightedBoard {
     }
 
     /// Calculates the reward for a particular board based on the given weights.
-    pub fn reward(&self, env: &Board, _agent: &AgentId) -> f64 {
+    pub fn reward(&self, env: &Board, &agent: &AgentId) -> f64 {
         let mut total_reward = 0i64;
 
         let mut tiles_current = *env.tiles_current();
@@ -51,7 +53,7 @@ impl WeightedBoard {
 
         let mut idx = 0u8;
 
-        while (tiles_current | tiles_opponent) == 0 {
+        while (tiles_current | tiles_opponent) != 0 {
             let (i, j) = (idx % 8, idx / 8);
 
             if (tiles_current & 1) == 1 {
@@ -66,6 +68,10 @@ impl WeightedBoard {
             idx += 1;
         }
 
-        return total_reward as f64;
+        if env.turn() == agent {
+            total_reward as f64
+        } else {
+            -total_reward as f64
+        }
     }
 }

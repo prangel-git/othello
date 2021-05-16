@@ -4,6 +4,7 @@ use othello::*;
 fn main() {
     // Making a weighted board for testing
     let mut weights = WeightedBoard::new();
+
     weights.set_reward(0, 10);
     weights.set_reward(1, 11);
     weights.set_reward(2, 12);
@@ -27,8 +28,8 @@ fn main() {
 
     let reward = Box::new(|env: &Board, agent: &AgentId| weights.reward(env, agent));
 
-    let mut dark = AlphabetaAgent::new(AgentId::Black, &reward, 1);
-    let mut light = AlphabetaAgent::new(AgentId::White, &reward, 1);
+    let mut dark = AlphabetaAgent::new(AgentId::Black, &reward, 5);
+    let mut light = AlphabetaAgent::new(AgentId::White, &reward, 5);
 
     let log = play(&mut board, &mut dark, &mut light);
 
@@ -40,8 +41,8 @@ fn main() {
 
     println!(
         "Final Score: Black {}, White {}",
-        board.count_black(),
-        board.count_white()
+        weights.reward(&board, &AgentId::Black),
+        weights.reward(&board, &AgentId::White)
     );
 
     let winner = board.winner();
