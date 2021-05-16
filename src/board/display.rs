@@ -4,8 +4,8 @@ use super::*;
 
 impl Display for Board {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        let tile_b = self.tile_b;
-        let tile_w = self.tile_w;
+        let tile_b = self.tiles_b();
+        let tile_w = self.tiles_w();
 
         let mut mask = 1u64;
 

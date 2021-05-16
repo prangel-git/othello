@@ -4,16 +4,14 @@ use super::*;
 impl Board {
     pub(super) fn new() -> Self {
         Board {
-            tile_w: 0b00001000_00010000_00000000_00000000_00000000,
-            tile_b: 0b00010000_00001000_00000000_00000000_00000000,
             turn: AgentId::Black,
-            tile_o: 0b00001000_00010000_00000000_00000000_00000000,
-            tile_c: 0b00010000_00001000_00000000_00000000_00000000,
+            tile_current: 0b00010000_00001000_00000000_00000000_00000000,
+            tile_opponent: 0b00001000_00010000_00000000_00000000_00000000,
             valid_v: vec![20, 29, 34, 43],
             valid: 0b00001000_00000100_00100000_00010000_00000000_00000000,
             occ_bord: 0b00111100_00111100_00111100_00111100_00000000_00000000,
-            count_b: 2,
-            count_w: 2,
+            count_current: 2,
+            count_opponent: 2,
             score: 0,
         }
     }
@@ -24,18 +22,12 @@ impl Board {
             for neighbour in find_neighbours(idx) {
                 if read_bit(self.opponent_tiles(), &neighbour) {
                     let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, neighbour);
-                    self.tile_b ^= tiles_to_flip;
-                    self.tile_w ^= tiles_to_flip;
+                    self.tile_current ^= tiles_to_flip;
+                    self.tile_opponent ^= tiles_to_flip;
 
-                    if self.turn == AgentId::White {
-                        self.score += 2 * number_to_flip;
-                        self.count_w += number_to_flip;
-                        self.count_b -= number_to_flip;
-                    } else {
-                        self.score -= 2 * number_to_flip;
-                        self.count_w -= number_to_flip;
-                        self.count_b += number_to_flip;
-                    }
+                    self.score += 2 * number_to_flip;
+                    self.count_current += number_to_flip;
+                    self.count_opponent -= number_to_flip;
                 }
             }
 
@@ -51,19 +43,10 @@ impl Board {
 
     /// Places a tile in an empty space
     fn place_tile(&mut self, idx: &Action) {
-        if self.turn == AgentId::White {
-            self.score += 1;
-            self.count_w += 1;
-            set_bit(&mut self.tile_w, idx);
-            self.tile_o = self.tile_b;
-            self.tile_c = self.tile_w;
-        } else {
-            self.score -= 1;
-            self.count_b += 1;
-            set_bit(&mut self.tile_b, idx);
-            self.tile_o = self.tile_w;
-            self.tile_c = self.tile_b;
-        }
+        self.score += 1;
+        self.count_current += 1;
+        set_bit(&mut self.tile_current, idx);
+
         self.switch_turn();
     }
 
@@ -100,7 +83,7 @@ impl Board {
         self.valid = 0;
         let mut attempts = 0u8;
 
-        let occupied = self.tile_w | self.tile_b;
+        let occupied = self.tile_current | self.tile_opponent;
 
         while attempts < 2 {
             let mut idx = 0;
@@ -135,29 +118,43 @@ impl Board {
     /// Switches turns
     fn switch_turn(&mut self) {
         self.turn = !self.turn;
-        let tile_c = self.tile_o;
-        self.tile_o = self.tile_c;
-        self.tile_c = tile_c;
+        self.score = -self.score;
+
+        let tile_current = self.tile_opponent;
+        self.tile_opponent = self.tile_current;
+        self.tile_current = tile_current;
+
+        let count_current = self.count_opponent;
+        self.count_opponent = self.count_current;
+        self.count_current = count_current;
     }
 
     /// Returns current player tiles
     fn current_tiles(&self) -> &Position {
-        &self.tile_c
+        &self.tile_current
     }
 
     /// Returns oponent player tiles
     fn opponent_tiles(&self) -> &Position {
-        &self.tile_o
+        &self.tile_opponent
     }
 
     /// Counts the number of white tiles in a position
     pub fn count_white(&self) -> i8 {
-        self.count_w
+        if self.turn == AgentId::White {
+            self.count_current
+        } else {
+            self.count_opponent
+        }
     }
 
     /// Counts the number of white tiles in a position
     pub fn count_black(&self) -> i8 {
-        self.count_b
+        if self.turn == AgentId::Black {
+            self.count_current
+        } else {
+            self.count_opponent
+        }
     }
 
     /// Returns current score
@@ -167,11 +164,19 @@ impl Board {
 
     /// Returns white tiles
     pub fn tiles_w(&self) -> Position {
-        self.tile_w
+        if self.turn == AgentId::White {
+            self.tile_current
+        } else {
+            self.tile_opponent
+        }
     }
 
     /// Returns black tiles
     pub fn tiles_b(&self) -> Position {
-        self.tile_b
+        if self.turn == AgentId::Black {
+            self.tile_current
+        } else {
+            self.tile_opponent
+        }
     }
 }

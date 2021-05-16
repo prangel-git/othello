@@ -40,10 +40,10 @@ impl Environment<Action, AgentId> for Board {
         if self.valid != 0 {
             None
         } else {
-            if self.score < 0 {
-                Some(AgentId::Black)
-            } else if self.score > 0 {
-                Some(AgentId::White)
+            if self.score() > 0 {
+                Some(self.turn)
+            } else if self.score() < 0 {
+                Some(!self.turn)
             } else {
                 None
             }
