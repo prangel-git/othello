@@ -1,4 +1,4 @@
-use super::{Action, Position};
+use super::{Action, Position, PositionIter};
 
 // Operations on bits
 
@@ -41,6 +41,18 @@ pub(super) fn neighbours_mask(&idx: &Action) -> Position {
     } else {
         0b00000111_00000111_00000111u64 << (idx - 9)
     }
+}
+
+/// Given an index and a region; it finds the directions that would get you to the region.
+pub(super) fn find_directions_iter(&idx: &u8, &region: &Position) -> PositionIter {
+    // The smallest direction is -9. Since we are working module 64, we can treat 9 as 0, and shift.
+    let directions = if idx > 9 {
+        (neighbours_mask(&idx) & region) >> (idx - 9)
+    } else {
+        (neighbours_mask(&idx) & region) << (9 - idx)
+    };
+
+    PositionIter::new_with_offset(&directions, &55)
 }
 
 /// Move to tile given by direction. If the movement goes out of bound, it returns !0.

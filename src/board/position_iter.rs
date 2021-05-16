@@ -10,6 +10,10 @@ impl PositionIter {
     pub fn new(&position: &Position) -> Self {
         PositionIter { position, index: 0 }
     }
+
+    pub fn new_with_offset(&position: &Position, &index: &u8) -> Self {
+        PositionIter { position, index }
+    }
 }
 
 impl Iterator for PositionIter {

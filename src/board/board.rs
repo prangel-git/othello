@@ -19,28 +19,21 @@ impl Board {
     /// Executes the move provided by idx.
     pub(super) fn action(&mut self, idx: &Action) -> bool {
         if read_bit(&self.valid, idx) {
-            let mask = neighbours_mask(&idx);
-            let mut directions = self.tiles_opponent & mask;
+            for direction in find_directions_iter(idx, &self.tiles_opponent) {
+                let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, direction);
 
-            if *idx > 9 {
-                directions >>= *idx - 9
-            } else {
-                directions <<= 9 - *idx
-            }
-
-            for direction in PositionIter::new(&directions) {
-                let dir = direction + 64 - 9;
-                let (tiles_to_flip, number_to_flip) = self.find_tiles_to_flip(idx, dir);
+                // Flips tiles
                 self.tiles_current ^= tiles_to_flip;
                 self.tiles_opponent ^= tiles_to_flip;
 
+                // Update score and counts
                 self.score += 2 * number_to_flip;
                 self.count_current += number_to_flip;
                 self.count_opponent -= number_to_flip;
             }
 
             self.place_tile(idx);
-            self.occ_bord |= mask;
+            self.occ_bord |= neighbours_mask(&idx);
             self.update_valid();
 
             true
@@ -93,18 +86,8 @@ impl Board {
 
         while attempts < 2 {
             for idx in PositionIter::new(&borders) {
-                let mask = neighbours_mask(&idx);
-                let mut directions = self.tiles_opponent & mask;
-
-                if idx > 9 {
-                    directions >>= idx - 9
-                } else {
-                    directions <<= 9 - idx
-                }
-
-                for direction in PositionIter::new(&directions) {
-                    let dir = direction + 64 - 9;
-                    let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, dir);
+                for direction in find_directions_iter(&idx, &self.tiles_opponent) {
+                    let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, direction);
                     if tiles_to_flip != 0 {
                         set_bit(&mut self.valid, &idx);
                         break;
