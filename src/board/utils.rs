@@ -42,34 +42,6 @@ pub(super) fn neighbours_mask(&idx: &Action) -> Position {
         0b00000111_00000111_00000111u64 << (idx - 9)
     }
 }
-/*
-/// Given an index and a board position, it finds all the directions in which the index
-/// can move to get into the board position.
-pub(super) fn find_neighbours_directions(&idx: &Action) -> Vec<Action> {
-
-    if idx > 63 {
-        Vec::new()
-    } else if idx == 63 {
-        vec![63, 56, 55]
-    } else if idx > 56 {
-        vec![1, 63, 57, 56, 55]
-    } else if idx == 56 {
-        vec![1, 56, 57]
-    } else if idx == 0 {
-        vec![1, 8, 9]
-    } else if (idx % 8) == 0 {
-        vec![1, 8, 9, 56, 57]
-    } else if idx == 7 {
-        vec![63, 8, 7]
-    } else if (idx % 8) == 7 {
-        vec![63, 56, 55, 8, 7]
-    } else if idx < 7 {
-        vec![1, 63, 7, 8, 9]
-    } else {
-        vec![1, 63, 7, 8, 9, 57, 56, 55]
-    }
-}
-*/
 
 /// Find neighbours of a given tile
 pub(super) fn find_neighbours(&idx: &Action) -> Vec<Action> {
