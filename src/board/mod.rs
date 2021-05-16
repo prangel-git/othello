@@ -3,12 +3,15 @@ mod display;
 mod environment;
 mod hash;
 mod partial_eq;
+mod position_iter;
 mod utils;
 
 use self::utils::*;
 
 use super::Action;
 use super::AgentId;
+
+use position_iter::PositionIter;
 
 /// Represents a 64 bits vector. The value of index k, represents a state of the k-th square of a board
 type Position = u64;

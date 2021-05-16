@@ -85,26 +85,20 @@ impl Board {
         let mut attempts = 0u8;
 
         let occupied = self.tiles_current | self.tiles_opponent;
+        let borders = self.occ_bord & !occupied;
 
         while attempts < 2 {
-            let mut idx = 0;
-            let mut borders = self.occ_bord & !occupied;
-
-            while borders != 0 {
-                if read_bit(&borders, &0) {
-                    for neighbour in find_neighbours(&idx) {
-                        if read_bit(&self.tiles_opponent, &neighbour) {
-                            let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
-                            if tiles_to_flip != 0 {
-                                self.valid_v.push(idx);
-                                set_bit(&mut self.valid, &idx);
-                                break;
-                            }
+            for idx in PositionIter::new(&borders) {
+                for neighbour in find_neighbours(&idx) {
+                    if read_bit(&self.tiles_opponent, &neighbour) {
+                        let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
+                        if tiles_to_flip != 0 {
+                            self.valid_v.push(idx);
+                            set_bit(&mut self.valid, &idx);
+                            break;
                         }
                     }
                 }
-                borders >>= 1;
-                idx += 1;
             }
 
             if self.valid == 0 {
