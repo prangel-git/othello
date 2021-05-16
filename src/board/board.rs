@@ -55,16 +55,16 @@ impl Board {
             self.score += 1;
             self.count_w += 1;
             set_bit(&mut self.tile_w, idx);
-            self.tile_o = self.tile_w;
-            self.tile_c = self.tile_b
+            self.tile_o = self.tile_b;
+            self.tile_c = self.tile_w;
         } else {
             self.score -= 1;
             self.count_b += 1;
             set_bit(&mut self.tile_b, idx);
-            self.tile_o = self.tile_b;
-            self.tile_c = self.tile_w;
+            self.tile_o = self.tile_w;
+            self.tile_c = self.tile_b;
         }
-        self.turn = !self.turn;
+        self.switch_turn();
     }
 
     /// Returns a vector containing the tiles from Action of different color until an anchor.
@@ -103,36 +103,19 @@ impl Board {
         let occupied = self.tile_w | self.tile_b;
 
         while attempts < 2 {
-            let is_white_turn = self.turn == AgentId::White;
-
             let mut idx = 0;
             let mut borders = self.occ_bord & !occupied;
 
             while borders != 0 {
                 if read_bit(&borders, &0) {
                     for neighbour in find_neighbours(&idx) {
-                        let direction = find_direction(&neighbour, &idx);
-                        let mut new_idx = neighbour;
-                        let mut is_occupied = read_bit(&occupied, &new_idx);
-                        let mut is_oposite_color =
-                            read_bit(&self.tile_w, &new_idx) != is_white_turn;
-                        let mut found_one_oposite = false;
-
-                        while is_occupied && is_oposite_color {
-                            found_one_oposite = true;
-                            new_idx = find_next_idx(&new_idx, &direction);
-                            if new_idx < 64 {
-                                is_occupied = read_bit(&occupied, &new_idx);
-                                is_oposite_color =
-                                    read_bit(&self.tile_w, &new_idx) != is_white_turn;
-                            } else {
+                        if read_bit(self.opponent_tiles(), &neighbour) {
+                            let (tiles_to_flip, _) = self.find_tiles_to_flip(&idx, neighbour);
+                            if tiles_to_flip != 0 {
+                                self.valid_v.push(idx);
+                                set_bit(&mut self.valid, &idx);
                                 break;
                             }
-                        }
-
-                        if found_one_oposite && is_occupied && !is_oposite_color {
-                            self.valid_v.push(idx);
-                            set_bit(&mut self.valid, &idx);
                         }
                     }
                 }
@@ -142,11 +125,19 @@ impl Board {
 
             if self.valid == 0 {
                 attempts += 1;
-                self.turn = !self.turn;
+                self.switch_turn();
             } else {
                 attempts = 3;
             }
         }
+    }
+
+    /// Switches turns
+    fn switch_turn(&mut self) {
+        self.turn = !self.turn;
+        let tile_c = self.tile_o;
+        self.tile_o = self.tile_c;
+        self.tile_c = tile_c;
     }
 
     /// Returns current player tiles
