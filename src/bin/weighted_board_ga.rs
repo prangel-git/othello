@@ -22,8 +22,8 @@ fn matching(x: &WeightedBoard, y: &WeightedBoard) -> f64 {
 
 fn main() {
     let params = AlgorithmParams {
-        rounds: 5,
-        max_population: 4,
+        rounds: 1000,
+        max_population: 8,
         mutation_rate: 0.1,
         co_rate: 0.5,
     };
@@ -32,5 +32,8 @@ fn main() {
 
     let last_population = ga_tournament_selection(&Vec::new(), &params, &matching_b);
 
-    println!("Last populations: {:?}", last_population);
+    println!("Last population:");
+    for weight in last_population {
+        println!("weight: {:?}", weight);
+    }
 }
