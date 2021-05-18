@@ -3,24 +3,9 @@ use othello::*;
 /// Two alphabeta prunning players playing othello
 fn main() {
     // Making a weighted board for testing
-    let mut weights = WeightedBoard::new();
+    let weights = WeightedBoard::new([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 
-    weights.set_reward(0, 10);
-    weights.set_reward(1, 11);
-    weights.set_reward(2, 12);
-    weights.set_reward(3, 13);
-    weights.set_reward(4, 14);
-    weights.set_reward(5, 15);
-    weights.set_reward(6, 16);
-    weights.set_reward(7, 17);
-    weights.set_reward(8, 18);
-
-    for i in 0..8 {
-        for j in 0..8 {
-            print!("|{:02}|", weights.get_weight(i, j));
-        }
-        print! {"\n"};
-    }
+    println!("Weighted board \n {:}", weights);
 
     // Testing weighted board during play.
 

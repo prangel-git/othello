@@ -14,7 +14,7 @@ impl Genetic for WeightedBoard {
             *w = rng.gen::<u8>();
         }
 
-        WeightedBoard { weights }
+        WeightedBoard::new(weights)
     }
 
     fn choromosome(&self) -> Chromosome {
@@ -34,7 +34,7 @@ impl Genetic for WeightedBoard {
 
     fn from_chromosome(chromosome: Chromosome) -> Self {
         if chromosome.is_empty() {
-            WeightedBoard::new()
+            WeightedBoard::new([1; 9])
         } else {
             let weights_vec = chromosome.into_vec();
             let mut lower = weights_vec[0];
@@ -54,7 +54,7 @@ impl Genetic for WeightedBoard {
 
             weights[8] = upper;
 
-            WeightedBoard { weights }
+            WeightedBoard::new(weights)
         }
     }
 }

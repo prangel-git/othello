@@ -33,7 +33,9 @@ fn main() {
     let last_population = ga_tournament_selection(&Vec::new(), &params, &matching_b);
 
     println!("Last population:");
-    for weight in last_population {
+    for weight in &last_population {
         println!("weight: {:?}", weight);
     }
+
+    println!("Best board: \n {:}", &last_population[0]);
 }
