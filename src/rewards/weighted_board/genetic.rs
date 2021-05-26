@@ -2,7 +2,6 @@ use super::*;
 
 use bitvec::prelude::*;
 
-
 use rand::Rng;
 
 use crate::Genetic;
