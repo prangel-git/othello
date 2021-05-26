@@ -11,9 +11,10 @@ edition = "2018"
 
 [dependencies]
     rand = "0.8"
+    bitvec = "0.22"
 
-    gts = {git = "https://github.com/prangel-git/gts.git", branch = "main"}
-    # gts = {path = "../gts"}
+    # gts = {git = "https://github.com/prangel-git/gts.git", branch = "main"}
+    gts = {path = "../gts"}
 
-    genetic = {git = "https://github.com/prangel-git/genetic", branch = "main"}
-    # genetic = {path = "../genetic"}
+    # genetic = {git = "https://github.com/prangel-git/genetic", branch = "main"}
+    genetic = {path = "../genetic"}

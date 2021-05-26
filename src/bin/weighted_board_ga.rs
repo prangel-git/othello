@@ -1,5 +1,8 @@
 use othello::*;
 
+use genetic::algorithm::ga_tournament_selection;
+use genetic::algorithm::AlgorithmParams;
+
 fn matching(x: &WeightedBoard, y: &WeightedBoard) -> f64 {
     let reward_x: Box<dyn Fn(&Board, &AgentId) -> f64> =
         Box::new(|env, agent| WeightedBoard::reward(x, env, agent));

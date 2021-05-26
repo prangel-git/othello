@@ -1,11 +1,15 @@
 use super::*;
 
+use bitvec::prelude::*;
+
+
 use rand::Rng;
 
-use crate::Chromosome;
 use crate::Genetic;
 
 impl Genetic for WeightedBoard {
+    type Chromosome = BitVec<Lsb0, u64>;
+
     fn new_random() -> Self {
         let mut rng = rand::thread_rng();
         let mut weights = [0; 9];
@@ -17,7 +21,7 @@ impl Genetic for WeightedBoard {
         WeightedBoard::new(weights)
     }
 
-    fn choromosome(&self) -> Chromosome {
+    fn choromosome(&self) -> Self::Chromosome {
         let mut lower = 0u64;
 
         for i in 0..8 {
@@ -29,10 +33,10 @@ impl Genetic for WeightedBoard {
 
         let slice = [lower, upper];
 
-        Chromosome::from_slice(&slice).unwrap()
+        Self::Chromosome::from_slice(&slice).unwrap()
     }
 
-    fn from_chromosome(chromosome: Chromosome) -> Self {
+    fn from_chromosome(chromosome: Self::Chromosome) -> Self {
         if chromosome.is_empty() {
             WeightedBoard::new([1; 9])
         } else {
