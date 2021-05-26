@@ -4,8 +4,6 @@ use super::*;
 
 /// Implements environment for Othello
 impl Environment<Action, AgentId> for Board {
-    type ActionIter = PositionIter;
-
     fn initial_state() -> Self {
         Board::new()
     }
@@ -20,8 +18,8 @@ impl Environment<Action, AgentId> for Board {
         return board;
     }
 
-    fn valid_actions(&self) -> Self::ActionIter {
-        PositionIter::new(&self.valid)
+    fn valid_actions(&self) -> Box<dyn Iterator<Item = Action>> {
+        Box::new(PositionIter::new(&self.valid))
     }
 
     fn is_valid(&self, action: &Action) -> bool {
