@@ -4,8 +4,8 @@ use othello::*;
 fn main() {
     let mut board = Board::initial_state();
 
-    let mut dark = AlphabetaAgent::new(AgentId::Black, &greedy_reward, 7);
-    let mut light = AlphabetaAgent::new(AgentId::White, &greedy_reward, 7);
+    let mut dark = MinmaxAgent::new(AgentId::Black, &greedy_reward, 7);
+    let mut light = MinmaxAgent::new(AgentId::White, &greedy_reward, 7);
 
     let log = play(&mut board, &mut dark, &mut light);
 
