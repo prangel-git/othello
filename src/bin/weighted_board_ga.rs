@@ -9,8 +9,8 @@ fn matching(x: &WeightedBoard, y: &WeightedBoard) -> f64 {
     let reward_y: Box<dyn Fn(&Board, &AgentId) -> f64> =
         Box::new(|env, agent| WeightedBoard::reward(y, env, agent));
 
-    let mut dark = AlphabetaAgent::new(AgentId::Black, &reward_x, 1);
-    let mut light = AlphabetaAgent::new(AgentId::White, &reward_y, 1);
+    let mut dark = MinmaxAgent::new(AgentId::Black, &reward_x, 1);
+    let mut light = MinmaxAgent::new(AgentId::White, &reward_y, 1);
 
     let mut board = Board::initial_state();
 
@@ -26,7 +26,7 @@ fn matching(x: &WeightedBoard, y: &WeightedBoard) -> f64 {
 fn main() {
     let params = AlgorithmParams {
         rounds: 1000,
-        max_population: 8,
+        max_population: 12,
         mutation_rate: 0.1,
         co_rate: 0.5,
     };
